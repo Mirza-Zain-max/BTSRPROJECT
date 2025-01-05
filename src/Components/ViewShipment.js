@@ -8,10 +8,11 @@ function ViewShipment() {
     const handleSearch = () => {
         // Fetch shipment details (mocked)
         const mockData = {
-            trackingId: "12345",
-            customerName: "John Doe",
-            address: "123 Main St",
-            status: "In Transit",
+            trackingId: "",
+            customerName: "",
+            address: "",
+            status: "",
+            rider : "",
         };
 
         if (trackingId === "12345") {
@@ -38,6 +39,7 @@ function ViewShipment() {
                     <p><b>Customer Name:</b> {shipmentDetails.customerName}</p>
                     <p><b>Address:</b> {shipmentDetails.address}</p>
                     <p><b>Status:</b> {shipmentDetails.status}</p>
+                    <p><b>Status:</b> {shipmentDetails.rider}</p>
                 </div>
             )}
         </div>
