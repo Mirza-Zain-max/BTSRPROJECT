@@ -11,7 +11,7 @@ import RiderList from '../../Pages/DashBoard/RiderList';
 import ExcelSheet from '../../Pages/DashBoard/ExcelSheet';
 // import RiderExcelSheet from '../../Pages/DashBoard/RiderExcelSheet';
 
-const { Header, Footer } = Layout;
+const { Header} = Layout;
 
 // Define menu items with route paths
 const items = [
