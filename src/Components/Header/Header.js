@@ -22,7 +22,7 @@ const items = [
     // { key: '4', label: <Link className='nav-link' to="/updateshipment">UpdateShipment</Link> },
     { key: '4', label: <Link className='nav-link' to="/viewshipment">ViewShipment</Link> },
     { key: '5', label: <Link className='nav-link' to="/rider">Rider</Link> },
-    { key: '6', label: <Link className='nav-link' to="/riderlist">RiderList</Link> },
+    { key: '6', label: <Link className='nav-link' to="/riderlist">Delivery Sheet</Link> },
     // { key: '7', label: <Link className='nav-link' to="/riderExcelSheet">RiderExcelSheet</Link> },
 ];
 
