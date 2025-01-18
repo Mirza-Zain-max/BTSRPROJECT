@@ -452,34 +452,220 @@
 // export default RiderList;
 
 
-import { Card, Form, Input, Select, DatePicker, message, Col, Row } from "antd";
-import moment from "moment";
-import React, { useEffect, useState, useRef } from "react";
+// import { Card, Form, Input, Select, DatePicker, message, Col, Row } from "antd";
+// import moment from "moment";
+// import React, { useEffect, useState, useRef } from "react";
+// import { Button } from "react-bootstrap";
+
+// const { Option } = Select;
+
+// const ExcelSheet = () => {
+//   const [form, setForm] = useState({
+//     consignee: "",
+//     cnnumber: "",
+//     rider: "",
+//     date: null,
+//   });
+//   const [riders, setRiders] = useState([]);
+//   const [couriers, setCouriers] = useState([]);
+//   const cnNumberInput = useRef(null); // Reference to CN Number input
+
+//   // Fetch riders and couriers from localStorage on component mount
+//   useEffect(() => {
+//     const savedRiders = localStorage.getItem("couriers");
+//     if (savedRiders) {
+//       setRiders(JSON.parse(savedRiders));
+//     }
+
+//     const savedCouriers = localStorage.getItem("courierData");
+//     if (savedCouriers) {
+//       setCouriers(JSON.parse(savedCouriers));
+//     }
+//   }, []);
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setForm({ ...form, [name]: value });
+//   };
+
+//   const handleRiderChange = (value) => {
+//     setForm({ ...form, rider: value });
+//   };
+
+//   const handleDateChange = (date, dateString) => {
+//     setForm({ ...form, date: dateString });
+//   };
+
+//   const handleAddCourier = () => {
+//     const { consignee, cnnumber, rider, date } = form;
+//     if (consignee && cnnumber && rider && date) {
+//       const newCourier = { consignee, cnnumber, rider, date };
+
+//       const updatedCouriers = [...couriers, newCourier];
+//       setCouriers(updatedCouriers);
+//       localStorage.setItem("courierData", JSON.stringify(updatedCouriers));
+
+//       // Reset consignee and CN number fields
+//       setForm({ consignee: "", cnnumber: "", rider: form.rider, date: form.date });
+
+//       message.success("Courier added successfully!");
+
+//       // Focus on CN number field after submission
+//       cnNumberInput.current.focus();
+//     } else {
+//       message.error("Please fill all fields!");
+//     }
+//   };
+
+//   const handleKeyPress = (event) => {
+//     if (event.key === "Enter") {
+//       event.preventDefault(); // Prevent form submission on Enter key press
+//       if (form.cnnumber && form.consignee) {
+//         handleAddCourier(); // Submit form on Enter press
+//       }
+//     }
+//   };
+
+//   const columns = [
+//     {
+//       title: "#",
+//       dataIndex: "index",
+//       key: "index",
+//       render: (_, __, index) => index + 1,
+//     },
+//     {
+//       title: "Rider",
+//       dataIndex: "rider",
+//       key: "rider",
+//     },
+//     {
+//       title: "Consignee",
+//       dataIndex: "consignee",
+//       key: "consignee",
+//     },
+//     {
+//       title: "CN Number",
+//       dataIndex: "cnnumber",
+//       key: "cnnumber",
+//     },
+//     {
+//       title: "Date",
+//       dataIndex: "date",
+//       key: "date",
+//     },
+//   ];
+
+//   return (
+//     <main style={{ height: "100vh" }} className="d-flex flex-column justify-content-center align-items-center">
+//       <div className="Rider">
+//         <h1 className="display-5">Make Delivery Sheet</h1>
+//         <Row className="d-flex justify-content-center align-items-center">
+//           <Col>
+//             <Form>
+//               <Card className="border-2 border-bottom border-black">
+//                 <Row>
+//                   <Col span={12}>
+//                     <label>
+//                       <span className="fw-bolder fs-6">Date</span>
+//                     </label><br />
+//                     <DatePicker
+//                       className="w-75"
+//                       onChange={handleDateChange}
+//                       value={form.date ? moment(form.date) : null}
+//                     />
+//                   </Col>
+//                   <Col span={12}>
+//                     <label>
+//                       <span className="fw-bolder fs-6">Select Rider</span><br />
+//                     </label>
+//                     <Select
+//                       className="w-75"
+//                       placeholder="Select a rider"
+//                       value={form.rider}
+//                       onChange={handleRiderChange}
+//                     >
+//                       {riders.map((rider, index) => (
+//                         <Option key={index} value={rider.name}>
+//                           {rider.name}
+//                         </Option>
+//                       ))}
+//                     </Select>
+//                   </Col>
+//                 </Row>
+//                 <label>
+//                   <span className="fw-bolder fs-6">CN Number</span>
+//                 </label>
+//                 <Input
+//                   className="my-2 border-2 rounded-2"
+//                   type="text"
+//                   name="cnnumber"
+//                   placeholder="CN Number"
+//                   value={form.cnnumber}
+//                   onKeyDown={handleKeyPress}
+//                   onChange={handleChange}
+//                   ref={cnNumberInput} // Use ref here for CN number
+//                 />
+//                 <label>
+//                   <span className="fw-bolder fs-6">Consignee</span>
+//                 </label>
+//                 <Input
+//                   className="my-2 border-2 rounded-2"
+//                   type="text"
+//                   name="consignee"
+//                   placeholder="Consignee"
+//                   value={form.consignee}
+//                   onKeyDown={handleKeyPress}
+//                   onChange={handleChange}
+//                 />
+
+//                 <div className="d-flex justify-content-center align-items-center">
+//                   <Button className="btn btn-success justify-content-center w-50 align-items-center d-flex" onClick={handleAddCourier}>
+//                     Add Rider
+//                   </Button>
+//                 </div>
+//               </Card>
+//             </Form>
+//           </Col>
+//         </Row>
+//       </div>
+
+//       {/* Excel-like table view */}
+//       {/* <div className="mt-5 w-75">
+//         <h2 className="text-center">Courier List</h2>
+//         <Table
+//           dataSource={couriers}
+//           columns={columns}
+//           rowKey="cnnumber"
+//           pagination={{ pageSize: 5 }}
+//         />
+//       </div> */}
+//     </main>
+//   );
+// };
+
+// export default ExcelSheet;
+
+
+import { Card, Form, Input, Select, DatePicker, message } from "antd";
+import React, { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
+import moment from "moment";
 
 const { Option } = Select;
 
-const RiderList = () => {
+const ExcelSheet = () => {
   const [form, setForm] = useState({
-    consignee: "",
-    cnnumber: "",
-    rider: "",
+    cnNumber: "",
+    consigneeNumber: "",
+    riderName: "",
     date: null,
   });
   const [riders, setRiders] = useState([]);
-  const [couriers, setCouriers] = useState([]);
-  const cnNumberInput = useRef(null); // Reference to CN Number input
 
-  // Fetch riders and couriers from localStorage on component mount
   useEffect(() => {
-    const savedRiders = localStorage.getItem("couriers");
+    const savedRiders = localStorage.getItem("riderData");
     if (savedRiders) {
       setRiders(JSON.parse(savedRiders));
-    }
-
-    const savedCouriers = localStorage.getItem("courierData");
-    if (savedCouriers) {
-      setCouriers(JSON.parse(savedCouriers));
     }
   }, []);
 
@@ -489,7 +675,7 @@ const RiderList = () => {
   };
 
   const handleRiderChange = (value) => {
-    setForm({ ...form, rider: value });
+    setForm({ ...form, riderName: value });
   };
 
   const handleDateChange = (date, dateString) => {
@@ -497,150 +683,76 @@ const RiderList = () => {
   };
 
   const handleAddCourier = () => {
-    const { consignee, cnnumber, rider, date } = form;
-    if (consignee && cnnumber && rider && date) {
-      const newCourier = { consignee, cnnumber, rider, date };
+    const { cnNumber, consigneeNumber, riderName, date } = form;
 
-      const updatedCouriers = [...couriers, newCourier];
-      setCouriers(updatedCouriers);
-      localStorage.setItem("courierData", JSON.stringify(updatedCouriers));
+    if (cnNumber && consigneeNumber && riderName && date) {
+      const savedCouriers = localStorage.getItem("courierData");
+      const couriers = savedCouriers ? JSON.parse(savedCouriers) : [];
 
-      // Reset consignee and CN number fields
-      setForm({ consignee: "", cnnumber: "", rider: form.rider, date: form.date });
-
+      couriers.push({ cnNumber, consigneeNumber, riderName, date });
+      localStorage.setItem("courierData", JSON.stringify(couriers));
+      setForm({ cnNumber: "", consigneeNumber: "", riderName: "", date: null });
       message.success("Courier added successfully!");
-
-      // Focus on CN number field after submission
-      cnNumberInput.current.focus();
     } else {
       message.error("Please fill all fields!");
     }
   };
 
-  const handleKeyPress = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault(); // Prevent form submission on Enter key press
-      if (form.cnnumber && form.consignee) {
-        handleAddCourier(); // Submit form on Enter press
-      }
-    }
-  };
-
-  const columns = [
-    {
-      title: "#",
-      dataIndex: "index",
-      key: "index",
-      render: (_, __, index) => index + 1,
-    },
-    {
-      title: "Rider",
-      dataIndex: "rider",
-      key: "rider",
-    },
-    {
-      title: "Consignee",
-      dataIndex: "consignee",
-      key: "consignee",
-    },
-    {
-      title: "CN Number",
-      dataIndex: "cnnumber",
-      key: "cnnumber",
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
-  ];
-
   return (
-    <main style={{ height: "100vh" }} className="d-flex flex-column justify-content-center align-items-center">
-      <div className="Rider">
-        <h1 className="display-5">Make Delivery Sheet</h1>
-        <Row className="d-flex justify-content-center align-items-center">
-          <Col>
-            <Form>
-              <Card className="border-2 border-bottom border-black">
-                <Row>
-                  <Col span={12}>
-                    <label>
-                      <span className="fw-bolder fs-6">Date</span>
-                    </label><br />
-                    <DatePicker
-                      className="w-75"
-                      onChange={handleDateChange}
-                      value={form.date ? moment(form.date) : null}
-                    />
-                  </Col>
-                  <Col span={12}>
-                    <label>
-                      <span className="fw-bolder fs-6">Select Rider</span><br />
-                    </label>
-                    <Select
-                      className="w-75"
-                      placeholder="Select a rider"
-                      value={form.rider}
-                      onChange={handleRiderChange}
-                    >
-                      {riders.map((rider, index) => (
-                        <Option key={index} value={rider.name}>
-                          {rider.name}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Col>
-                </Row>
-                <label>
-                  <span className="fw-bolder fs-6">CN Number</span>
-                </label>
-                <Input
-                  className="my-2 border-2 rounded-2"
-                  type="text"
-                  name="cnnumber"
-                  placeholder="CN Number"
-                  value={form.cnnumber}
-                  onKeyDown={handleKeyPress}
-                  onChange={handleChange}
-                  ref={cnNumberInput} // Use ref here for CN number
-                />
-                <label>
-                  <span className="fw-bolder fs-6">Consignee</span>
-                </label>
-                <Input
-                  className="my-2 border-2 rounded-2"
-                  type="text"
-                  name="consignee"
-                  placeholder="Consignee"
-                  value={form.consignee}
-                  onKeyDown={handleKeyPress}
-                  onChange={handleChange}
-                />
+    <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+      <div>
+        <h1>Add Courier</h1>
+        <Form>
+          <Card>
+            <label>Date</label>
+            <DatePicker
+              className="my-2 w-100"
+              onChange={handleDateChange}
+              value={form.date ? moment(form.date) : null}
+            />
 
-                <div className="d-flex justify-content-center align-items-center">
-                  <Button className="btn btn-success justify-content-center w-50 align-items-center d-flex" onClick={handleAddCourier}>
-                    Add Courier
-                  </Button>
-                </div>
-              </Card>
-            </Form>
-          </Col>
-        </Row>
+            <label>Select Rider</label>
+            <Select
+              className="my-2 w-100"
+              placeholder="Select a rider"
+              value={form.riderName}
+              onChange={handleRiderChange}
+            >
+              {riders.map((rider, index) => (
+                <Option key={index} value={rider.riderName}>
+                  {rider.riderName}
+                </Option>
+              ))}
+            </Select>
+
+            <label>CN Number</label>
+            <Input
+              className="my-2"
+              type="text"
+              name="cnNumber"
+              placeholder="CN Number"
+              value={form.cnNumber}
+              onChange={handleChange}
+            />
+
+            <label>Consignee Number</label>
+            <Input
+              className="my-2"
+              type="text"
+              name="consigneeNumber"
+              placeholder="Consignee Number"
+              value={form.consigneeNumber}
+              onChange={handleChange}
+            />
+
+            <Button className="mt-3 w-100" onClick={handleAddCourier}>
+              Add Courier
+            </Button>
+          </Card>
+        </Form>
       </div>
-
-      {/* Excel-like table view */}
-      {/* <div className="mt-5 w-75">
-        <h2 className="text-center">Courier List</h2>
-        <Table
-          dataSource={couriers}
-          columns={columns}
-          rowKey="cnnumber"
-          pagination={{ pageSize: 5 }}
-        />
-      </div> */}
     </main>
   );
 };
 
-export default RiderList;
+export default ExcelSheet;

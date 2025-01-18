@@ -296,96 +296,42 @@
 // };
 
 // export default UpdateShipment;
-
-import { Card, Select, DatePicker, message, Row, Col } from "antd";
-import React, { useEffect, useState } from "react";
-import { Button, Container } from "react-bootstrap";
-
-const { Option } = Select;
+import { Table, Card } from "antd";
+import React, { useState, useEffect } from "react";
 
 const UpdateShipment = () => {
-  const [riders, setRiders] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [selectedRider, setSelectedRider] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
+  const [data, setData] = useState([]);
 
-  // Fetch riders from localStorage on component mount
   useEffect(() => {
-    const savedRiders = localStorage.getItem("couriers");
-    if (savedRiders) {
-      setRiders(JSON.parse(savedRiders));
-    }
-  }, []);
+    const riderData = JSON.parse(localStorage.getItem("riderData") || "[]");
+    const courierData = JSON.parse(localStorage.getItem("courierData") || "[]");
 
-  const handleFilter = () => {
-    const savedCouriers = localStorage.getItem("courierData");
-    const couriers = savedCouriers ? JSON.parse(savedCouriers) : [];
-
-    const filtered = couriers.filter((courier) => {
-      const courierDate = new Date(courier.date).toLocaleDateString();
-      const selectedDateFormatted = new Date(selectedDate).toLocaleDateString();
-      return (
-        courier.rider === selectedRider &&
-        courierDate === selectedDateFormatted
-      );
+    // Combine riderData and courierData
+    const combinedData = courierData.map((courier) => {
+      const rider = riderData.find((r) => r.riderName === courier.riderName);
+      return {
+        ...courier,
+        receiverName: rider ? rider.receiverName : "N/A",
+      };
     });
 
-    setFilteredData(filtered);
+    setData(combinedData);
+  }, []);
 
-    if (filtered.length === 0) {
-      message.warning("No data found for the selected rider and date.");
-    }
-  };
+  const columns = [
+    { title: "Rider Name", dataIndex: "riderName", key: "riderName" },
+    { title: "Receiver Name", dataIndex: "receiverName", key: "receiverName" },
+    { title: "CN Number", dataIndex: "cnNumber", key: "cnNumber" },
+    { title: "Consignee Number", dataIndex: "consigneeNumber", key: "consigneeNumber" },
+    { title: "Date", dataIndex: "date", key: "date" },
+  ];
 
   return (
-    <main className="justify-content-center align-items-center d-flex">
-      <Container >
-        <Row className="justify-content-center align-items-center d-flex">
-          <Col>
-            <h2>Search by Rider and Date</h2>
-            <Card className="p-4 border-2">
-              <label>Select Rider</label>
-              <Select
-                className="my-2 w-100"
-                placeholder="Select a rider"
-                value={selectedRider}
-                onChange={(value) => setSelectedRider(value)}
-              >
-                {riders.map((rider, index) => (
-                  <Option key={index} value={rider.name}>
-                    {rider.name}
-                  </Option>
-                ))}
-              </Select>
-
-              <label>Select Date</label>
-              <DatePicker
-                className="my-2 w-100"
-                onChange={(date, dateString) => setSelectedDate(dateString)}
-              />
-
-              <Button className="mt-3" onClick={handleFilter}>
-                Search
-              </Button>
-
-              {filteredData.length > 0 && (
-                <div className="mt-4">
-                  <h3>Filtered Data</h3>
-                  <ul>
-                    {filteredData.map((courier, index) => (
-                      <li key={index}>
-                        <b>CN Number:</b> {courier.cnnumber} | <b>Consignee:</b>{" "}
-                        {courier.consignee} | <b>Date:</b>{" "}
-                        {new Date(courier.date).toLocaleString()}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+    <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+      <Card className="w-75">
+        <h1>Update Shipment</h1>
+        <Table columns={columns} dataSource={data} rowKey="cnNumber" />
+      </Card>
     </main>
   );
 };
