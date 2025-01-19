@@ -646,6 +646,119 @@
 // export default ExcelSheet;
 
 
+// import { Card, Form, Input, Select, DatePicker, message } from "antd";
+// import React, { useState, useEffect } from "react";
+// import { Button } from "react-bootstrap";
+// import moment from "moment";
+
+// const { Option } = Select;
+
+// const ExcelSheet = () => {
+//   const [form, setForm] = useState({
+//     cnNumber: "",
+//     consigneeNumber: "",
+//     riderName: "",
+//     date: null,
+//   });
+//   const [riders, setRiders] = useState([]);
+
+//   useEffect(() => {
+//     const savedRiders = localStorage.getItem("riderData");
+//     if (savedRiders) {
+//       setRiders(JSON.parse(savedRiders));
+//     }
+//   }, []);
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setForm({ ...form, [name]: value });
+//   };
+
+//   const handleRiderChange = (value) => {
+//     setForm({ ...form, riderName: value });
+//   };
+
+//   const handleDateChange = (date, dateString) => {
+//     setForm({ ...form, date: dateString });
+//   };
+
+//   const handleAddCourier = () => {
+//     const { cnNumber, consigneeNumber, riderName, date } = form;
+
+//     if (cnNumber && consigneeNumber && riderName && date) {
+//       const savedCouriers = localStorage.getItem("courierData");
+//       const couriers = savedCouriers ? JSON.parse(savedCouriers) : [];
+
+//       couriers.push({ cnNumber, consigneeNumber, riderName, date });
+//       localStorage.setItem("courierData", JSON.stringify(couriers));
+//       setForm({ cnNumber: "", consigneeNumber: "", riderName: "", date: null });
+//       message.success("Courier added successfully!");
+//     } else {
+//       message.error("Please fill all fields!");
+//     }
+//   };
+
+//   return (
+//     <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+//       <div>
+//         <h1>Add Courier</h1>
+//         <Form>
+//           <Card>
+//             <label>Date</label>
+//             <DatePicker
+//               className="my-2 w-100"
+//               onChange={handleDateChange}
+//               value={form.date ? moment(form.date) : null}
+//             />
+
+//             <label>Select Rider</label>
+//             <Select
+//               className="my-2 w-100"
+//               placeholder="Select a rider"
+//               value={form.riderName}
+//               onChange={handleRiderChange}
+//             >
+//               {riders.map((rider, index) => (
+//                 <Option key={index} value={rider.riderName}>
+//                   {rider.riderName}
+//                 </Option>
+//               ))}
+//             </Select>
+
+//             <label>CN Number</label>
+//             <Input
+//               className="my-2"
+//               type="text"
+//               name="cnNumber"
+//               placeholder="CN Number"
+//               value={form.cnNumber}
+//               onChange={handleChange}
+//             />
+
+//             <label>Consignee Name
+//             </label>
+//             <Input
+//               className="my-2"
+//               type="text"
+//               name="consigneeNumber"
+//               placeholder="Consignee Name"
+//               value={form.consigneeNumber}
+//               onChange={handleChange}
+//             />
+
+//             <Button className="mt-3 w-100" onClick={handleAddCourier}>
+//               Add Courier
+//             </Button>
+//           </Card>
+//         </Form>
+//       </div>
+//     </main>
+//   );
+// };
+
+// export default ExcelSheet;
+
+
 import { Card, Form, Input, Select, DatePicker, message } from "antd";
 import React, { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
@@ -657,6 +770,7 @@ const ExcelSheet = () => {
   const [form, setForm] = useState({
     cnNumber: "",
     consigneeNumber: "",
+    selectedRider: "" ,
     riderName: "",
     date: null,
   });
@@ -678,8 +792,8 @@ const ExcelSheet = () => {
     setForm({ ...form, riderName: value });
   };
 
-  const handleDateChange = (date, dateString) => {
-    setForm({ ...form, date: dateString });
+  const handleDateChange = (date) => {
+    setForm({ ...form, date: date ? moment(date).format("YYYY-MM-DD") : null });
   };
 
   const handleAddCourier = () => {
@@ -708,7 +822,7 @@ const ExcelSheet = () => {
             <DatePicker
               className="my-2 w-100"
               onChange={handleDateChange}
-              value={form.date ? moment(form.date) : null}
+              value={form.date ? moment(form.date, "YYYY-MM-DD") : null}
             />
 
             <label>Select Rider</label>
@@ -735,12 +849,12 @@ const ExcelSheet = () => {
               onChange={handleChange}
             />
 
-            <label>Consignee Number</label>
+            <label>Consignee Name</label>
             <Input
               className="my-2"
               type="text"
               name="consigneeNumber"
-              placeholder="Consignee Number"
+              placeholder="Consignee Name"
               value={form.consigneeNumber}
               onChange={handleChange}
             />

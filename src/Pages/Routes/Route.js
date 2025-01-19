@@ -8,6 +8,8 @@ import ExcelSheet from '../DashBoard/ExcelSheet';
 import RiderList from '../DashBoard/RiderList';
 import ViewShipment from '../DashBoard/ViewShipment';
 import UpdateShipment from '../DashBoard/UpdateShipment';
+import CPage from '../DashBoard/Cpage';
+import ShowData from '../DashBoard/ShowData';
 
 const FrontEnd = () => {
   return (
@@ -21,6 +23,8 @@ const FrontEnd = () => {
         <Route path='/veiwrider' element={<ExcelSheet/>}/>
         <Route path='/riderlist' element={<RiderList/>}/>
         <Route path='/upDate' element={<UpdateShipment/>}/>
+        <Route path='/cPage' element={<CPage/>}/>
+        <Route path='/showData' element={<ShowData/>}/>
     </Routes>
     </>
   )

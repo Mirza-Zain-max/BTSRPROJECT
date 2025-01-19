@@ -170,6 +170,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Link } from 'react-router-dom';
+// import CPage from '../../Pages/DashBoard/Cpage';
 
 function Header1() {
   return (
@@ -181,13 +182,16 @@ function Header1() {
           <Nav className="me-auto">
             {/* <Link className='nav-link' to="/"></Link> */}
             <Link className='nav-link text-light' to="/viewShipment">Tracking</Link>
+            {/* <Link className='nav-link text-light' to="/listShipment">Tracking</Link> */}
             <NavDropdown title="Delivery" id="basic-nav-dropdown">
               {/* <Link className=' text-dark nav-link' to="/">Add Rider</Link> <hr />
               <Link className=' text-dark nav-link' to="/riderlist">
                 UpDate Rider
               </Link><hr /> */}
               <Link className=' text-dark nav-link' to="/veiwrider">Run Sheet</Link>
-              <Link className=' text-dark nav-link' to="/upDate">Veiw Sheet</Link>
+              <Link className=' text-dark nav-link' to="/riderlist">Veiw Sheet</Link>
+              <Link className=' text-dark nav-link' to='/showData'>Show Data</Link>
+              <Link className=' text-dark nav-link' to='/cPage'>Show Data</Link>
             </NavDropdown>
             <NavDropdown title="Rider" id="basic-nav-dropdown">
               <Link className='text-dark nav-link' to="/">Add Rider</Link>
