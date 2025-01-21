@@ -759,114 +759,401 @@
 // export default ExcelSheet;
 
 
+// import { Card, Form, Input, Select, DatePicker, message } from "antd";
+// import React, { useState, useEffect } from "react";
+// import { Button } from "react-bootstrap";
+// import moment from "moment";
+
+// const { Option } = Select;
+
+// const RunSheet = () => {
+//   const [form, setForm] = useState({
+//     cnNumber: "",
+//     consigneeNumber: "",
+//     riderName: "",
+//     date: null,
+//     selectedRider: ""
+//   });
+//   const [riders, setRiders] = useState([]);
+
+//   useEffect(() => {
+//     const savedRiders = localStorage.getItem("couriers");
+//     if (savedRiders) {
+//       setRiders(JSON.parse(savedRiders));
+//     }
+//   }, []);
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setForm({ ...form, [name]: value });
+//   };
+
+//   const handleRiderSelect = (value) => { setForm({ ...form, selectedRider: value }); };
+//   const handleAddRider = () => {
+//     const { receiverName, selectedRider } = form;
+//     if (receiverName && selectedRider) {
+//       const savedData = localStorage.getItem("couriers");
+//       const riders = savedData ? JSON.parse(savedData) : [];
+//       // Add new data to riderData
+//       riders.push({ receiverName, riderName: selectedRider, date: new Date().toISOString(), });
+//       localStorage.setItem("riderData", JSON.stringify(riders));
+//       setForm({  selectedRider: "" });
+//       message.success("Receiver and Rider added successfully!");
+//     } else { message.error("Please fill all fields!") }
+//   };
+
+//   const handleRiderChange = (value) => {
+//     setForm({ ...form, riderName: value });
+//   };
+//   console.log(handleAddRider);
+
+//   const handleDateChange = (date) => {
+//     setForm({ ...form, date: date ? moment(date).format("YYYY-MM-DD") : null });
+//   };
+
+//   const handleAddCourier = () => {
+//     const { cnNumber, consigneeNumber, riderName, date, selectedRider } = form;
+
+//     if (cnNumber && consigneeNumber && riderName && date && selectedRider) {
+//       const savedCouriers = localStorage.getItem("courierData");
+//       const couriers = savedCouriers ? JSON.parse(savedCouriers) : [];
+
+//       couriers.push({ cnNumber, consigneeNumber, selectedRider, riderName, date });
+//       localStorage.setItem("courierData", JSON.stringify(couriers));
+//       setForm({ cnNumber: "", consigneeNumber: "", riderName: "", date: null });
+//       message.success("Courier added successfully!");
+//     } else {
+//       message.error("Please fill all fields!");
+//     }
+//   };
+
+//   return (
+//     <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+//       <div>
+//         <h1><i>Run Sheet</i></h1>
+//         <Form>
+//           <Card>
+//             <label>Date</label>
+//             <DatePicker
+//               className="my-2 w-100"
+//               onChange={handleDateChange}
+//               value={form.date ? moment(form.date, "YYYY-MM-DD") : null}
+//             />
+
+//             {/* {/* <label>Select Rider</label>
+//             <label>Select Rider</label>
+//             <Select
+//               className="my-2 w-100"
+//               placeholder="Select a rider"
+//               value={form.selectedRider}
+//               onChange={handleRiderSelect}
+//             >
+//               {riders.map((rider, index) => (
+//                 <Option key={index} value={rider.name}>
+//                   {rider.name}
+//                 </Option>
+//               ))}
+//             </Select> */}
+//             <Select className="my-2 w-100" placeholder="Select a rider" value={form.selectedRider} onChange={handleRiderSelect}>
+//               {riders.map((rider, index) => (<Option key={index} value={rider.name}> {rider.name} </Option>))}
+//             </Select>
+
+//             <label>CN Number</label>
+//             <Input
+//               className="my-2"
+//               type="text"
+//               name="cnNumber"
+//               placeholder="CN Number"
+//               value={form.cnNumber}
+//               onChange={handleChange}
+//             />
+
+//             <label>Consignee Name</label>
+//             <Input
+//               className="my-2"
+//               type="text"
+//               name="consigneeNumber"
+//               placeholder="Consignee Name"
+//               value={form.consigneeNumber}
+//               onChange={handleChange}
+//             />
+
+//             <Button className="mt-3 w-100" variant="success" onClick={handleAddRider}>
+//               Add Rider
+//             </Button>
+//           </Card>
+//         </Form>
+//       </div>
+//     </main>
+//   );
+// };
+
+// export default RunSheet;
+
+
+// import { Card, Form, Input, Select, DatePicker, message } from "antd";
+// import React, { useState, useEffect } from "react";
+// import { Button } from "react-bootstrap";
+// import moment from "moment";
+
+// const { Option } = Select;
+
+// const RunSheet = () => {
+//   const [form, setForm] = useState({
+//     cnNumber: "",
+//     consigneeNumber: "",
+//     riderName: "",
+//     date: null,
+//     selectedRider: ""
+//   });
+//   const [riders, setRiders] = useState([]);
+
+//   useEffect(() => {
+//     const savedRiders = localStorage.getItem("couriers");
+//     if (savedRiders) {
+//       setRiders(JSON.parse(savedRiders));
+//     }
+//   }, []);
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setForm({ ...form, [name]: value });
+//   };
+
+//   const handleRiderSelect = (value) => {
+//     setForm({ ...form, selectedRider: value });
+//   };
+
+//   const handleDateChange = (date) => {
+//     setForm({ ...form, date: date ? moment(date).format("YYYY-MM-DD") : null });
+//   };
+
+//   const handleAddCourier = () => {
+//     const { cnNumber, consigneeNumber, riderName, date, selectedRider } = form;
+
+//     if (cnNumber && consigneeNumber && riderName && date && selectedRider) {
+//       const savedCouriers = localStorage.getItem("courierData");
+//       const couriers = savedCouriers ? JSON.parse(savedCouriers) : [];
+
+//       couriers.push({ cnNumber, consigneeNumber, selectedRider, riderName, date });
+//       localStorage.setItem("courierData", JSON.stringify(couriers));
+//       setForm({ cnNumber: "", consigneeNumber: "", riderName: "", date: null, selectedRider: "" });
+//       message.success("Courier added successfully!");
+//     } else {
+//       message.error("Please fill all fields!");
+//     }
+//   };
+
+//   return (
+//     <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+//       <div>
+//         <h1><i>Run Sheet</i></h1>
+//         <Form>
+//           <Card>
+//             <label>Date</label>
+//             <DatePicker
+//               className="my-2 w-100"
+//               onChange={handleDateChange}
+//               value={form.date ? moment(form.date, "YYYY-MM-DD") : null}
+//             />
+
+//             <Select
+//               className="my-2 w-100"
+//               placeholder="Select a rider"
+//               value={form.selectedRider}
+//               onChange={handleRiderSelect}
+//             >
+//               {riders.map((rider, index) => (
+//                 <Option key={index} value={rider.name}>
+//                   {rider.name}
+//                 </Option>
+//               ))}
+//             </Select>
+
+//             <label>CN Number</label>
+//             <Input
+//               className="my-2"
+//               type="text"
+//               name="cnNumber"
+//               placeholder="CN Number"
+//               value={form.cnNumber}
+//               onChange={handleChange}
+//             />
+
+//             <label>Consignee Name</label>
+//             <Input
+//               className="my-2"
+//               type="text"
+//               name="consigneeNumber"
+//               placeholder="Consignee Name"
+//               value={form.consigneeNumber}
+//               onChange={handleChange}
+//             />
+
+//             <Button className="mt-3 w-100" variant="success" onClick={handleAddCourier}>
+//               Add Courier
+//             </Button>
+//           </Card>
+//         </Form>
+//       </div>
+//     </main>
+//   );
+// };
+
+// export default RunSheet;
+
 import { Card, Form, Input, Select, DatePicker, message } from "antd";
 import React, { useState, useEffect } from "react";
-import { Button } from "react-bootstrap";
-import moment from "moment";
+// import { Button } from "react-bootstrap";
+// import moment from "moment";
 
-const { Option } = Select;
+// const { Option } = Select;
 
-const ExcelSheet = () => {
-  const [form, setForm] = useState({
-    cnNumber: "",
-    consigneeNumber: "",
-    selectedRider: "" ,
-    riderName: "",
-    date: null,
-  });
-  const [riders, setRiders] = useState([]);
+// const RunSheet = () => {
+//     const [form, setForm] = useState({
+//         cnNumber: "",
+//         consigneeName: "",
+//         riderId: "",
+//         date: null,
+//     });
+//     const [riders, setRiders] = useState([]);
 
-  useEffect(() => {
-    const savedRiders = localStorage.getItem("riderData");
-    if (savedRiders) {
-      setRiders(JSON.parse(savedRiders));
-    }
-  }, []);
+//     useEffect(() => {
+//         const savedRiders = localStorage.getItem("couriers");
+//         if (savedRiders) {
+//             setRiders(JSON.parse(savedRiders));
+//         }
+//     }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
+//     const handleChange = (e) => {
+//         const { name, value } = e.target;
+//         setForm({ ...form, [name]: value });
+//     };
 
-  const handleRiderChange = (value) => {
-    setForm({ ...form, riderName: value });
-  };
+//     const handleRiderSelect = (value) => {
+//         setForm({ ...form, riderId: value });
+//     };
 
-  const handleDateChange = (date) => {
-    setForm({ ...form, date: date ? moment(date).format("YYYY-MM-DD") : null });
-  };
+//     const handleDateChange = (date) => {
+//         setForm({ ...form, date: date ? moment(date).format("YYYY-MM-DD") : null });
+//     };
 
-  const handleAddCourier = () => {
-    const { cnNumber, consigneeNumber, riderName, date } = form;
+//     const handleAddCourier = () => {
+//         const { cnNumber, consigneeName, riderId, date } = form;
 
-    if (cnNumber && consigneeNumber && riderName && date) {
-      const savedCouriers = localStorage.getItem("courierData");
-      const couriers = savedCouriers ? JSON.parse(savedCouriers) : [];
+//         if (cnNumber && consigneeName && riderId && date) {
+//             const savedCouriers = localStorage.getItem("courierData");
+//             const couriers = savedCouriers ? JSON.parse(savedCouriers) : [];
 
-      couriers.push({ cnNumber, consigneeNumber, riderName, date });
-      localStorage.setItem("courierData", JSON.stringify(couriers));
-      setForm({ cnNumber: "", consigneeNumber: "", riderName: "", date: null });
-      message.success("Courier added successfully!");
-    } else {
-      message.error("Please fill all fields!");
-    }
-  };
+//             couriers.push({ cnNumber, consigneeName, riderId, date });
+//             localStorage.setItem("courierData", JSON.stringify(couriers));
+//             setForm({ cnNumber: "", consigneeName: "", riderId: "", date: null });
+//             message.success("Courier added successfully!");
+//         } else {
+//             message.error("Please fill all fields!");
+//         }
+//     };
 
-  return (
-    <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+//     return (
+//         <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+//             <div>
+//                 <h1>Run Sheet</h1>
+//                 <Form>
+//                     <Card>
+//                         <label>Date</label>
+//                         <DatePicker
+//                             className="my-2 w-100"
+//                             onChange={handleDateChange}
+//                             value={form.date ? moment(form.date, "YYYY-MM-DD") : null}
+//                         />
+
+//                         <Select
+//                             className="my-2 w-100"
+//                             placeholder="Select a rider"
+//                             value={form.riderId}
+//                             onChange={handleRiderSelect}
+//                         >
+//                             {riders.map((rider) => (
+//                                 <Option key={rider.id} value={rider.id}>
+//                                     {rider.name}
+//                                 </Option>
+//                             ))}
+//                         </Select>
+
+//                         <label>CN Number</label>
+//                         <Input
+//                             className="my-2"
+//                             type="text"
+//                             name="cnNumber"
+//                             placeholder="CN Number"
+//                             value={form.cnNumber}
+//                             onChange={handleChange}
+//                         />
+
+//                         <label>Consignee Name</label>
+//                         <Input
+//                             className="my-2"
+//                             type="text"
+//                             name="consigneeName"
+//                             placeholder="Consignee Name"
+//                             value={form.consigneeName}
+//                             onChange={handleChange}
+//                         />
+
+//                         <Button className="mt-3 w-100" variant="success" onClick={handleAddCourier}>
+//                             Add Courier
+//                         </Button>
+//                     </Card>
+//                 </Form>
+//             </div>
+//         </main>
+//     );
+// };
+const RunSheet = () => {
+    const [riders, setRiders] = useState(JSON.parse(localStorage.getItem('riders')) || []);
+    const [deliveries, setDeliveries] = useState(JSON.parse(localStorage.getItem('deliveries')) || []);
+    const [delivery, setDelivery] = useState({ riderIndex: '', date: '', cnNumber: '', consigneeName: '' });
+  
+    useEffect(() => {
+      localStorage.setItem('deliveries', JSON.stringify(deliveries));
+    }, [deliveries]);
+  
+    const handleDeliveryChange = (e) => {
+      const { name, value } = e.target;
+      setDelivery(prev => ({ ...prev, [name]: value }));
+    };
+  
+    const saveDelivery = () => {
+      if (!delivery.riderIndex || !delivery.date || !delivery.cnNumber || !delivery.consigneeName) {
+        alert('Please fill all fields!');
+        return;
+      }
+      setDeliveries([...deliveries, { ...delivery, rider: riders[delivery.riderIndex].name }]);
+      setDelivery({ riderIndex: '', date: '', cnNumber: '', consigneeName: '' });
+      alert('Delivery saved successfully!');
+    };
+  
+    return (
       <div>
-        <h1>Add Courier</h1>
-        <Form>
-          <Card>
-            <label>Date</label>
-            <DatePicker
-              className="my-2 w-100"
-              onChange={handleDateChange}
-              value={form.date ? moment(form.date, "YYYY-MM-DD") : null}
-            />
-
-            <label>Select Rider</label>
-            <Select
-              className="my-2 w-100"
-              placeholder="Select a rider"
-              value={form.riderName}
-              onChange={handleRiderChange}
-            >
-              {riders.map((rider, index) => (
-                <Option key={index} value={rider.riderName}>
-                  {rider.riderName}
-                </Option>
-              ))}
-            </Select>
-
-            <label>CN Number</label>
-            <Input
-              className="my-2"
-              type="text"
-              name="cnNumber"
-              placeholder="CN Number"
-              value={form.cnNumber}
-              onChange={handleChange}
-            />
-
-            <label>Consignee Name</label>
-            <Input
-              className="my-2"
-              type="text"
-              name="consigneeNumber"
-              placeholder="Consignee Name"
-              value={form.consigneeNumber}
-              onChange={handleChange}
-            />
-
-            <Button className="mt-3 w-100" onClick={handleAddCourier}>
-              Add Courier
-            </Button>
-          </Card>
-        </Form>
+        <h2>Make Delivery Sheet</h2>
+        <label>Select Rider:</label>
+        <select name="riderIndex" value={delivery.riderIndex} onChange={handleDeliveryChange}>
+          <option value="" disabled>Select a rider</option>
+          {riders.map((rider, index) => (
+            <option key={index} value={index}>{rider.name}</option>
+          ))}
+        </select>
+        <label>Date:</label>
+        <input type="date" name="date" value={delivery.date} onChange={handleDeliveryChange} />
+        <label>CN Number:</label>
+        <input type="text" name="cnNumber" value={delivery.cnNumber} onChange={handleDeliveryChange} />
+        <label>Consignee Name:</label>
+        <input type="text" name="consigneeName" value={delivery.consigneeName} onChange={handleDeliveryChange} />
+        <button onClick={saveDelivery}>Save Delivery</button>
       </div>
-    </main>
-  );
-};
+    );
+  };
 
-export default ExcelSheet;
+export default RunSheet;
+
+
