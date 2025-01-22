@@ -1002,8 +1002,8 @@
 
 // export default RunSheet;
 
-import { Card, Form, Input, Select, DatePicker, message } from "antd";
-import React, { useState, useEffect } from "react";
+// import { Card, Form, Input, Select, DatePicker, message } from "antd";
+// import React, { useState, useEffect } from "react";
 // import { Button } from "react-bootstrap";
 // import moment from "moment";
 
@@ -1108,52 +1108,171 @@ import React, { useState, useEffect } from "react";
 //             </div>
 //         </main>
 //     );
+// // };
+// import { Button, Card, Col, Input, message, Row, Select, Typography } from "antd";
+// import React, { useState, useEffect } from "react";
+// import { Container } from "react-bootstrap";
+// const RunSheet = () => {
+//     const { Title, Paragraph } = Typography;
+//     const [riders, setRiders] = useState(JSON.parse(localStorage.getItem('riders')) || []);
+//     const [deliveries, setDeliveries] = useState(JSON.parse(localStorage.getItem('deliveries')) || []);
+//     const [delivery, setDelivery] = useState({ riderIndex: '', date: '', cnNumber: '', consigneeName: '' });
+
+//     useEffect(() => {
+//         localStorage.setItem('deliveries', JSON.stringify(deliveries));
+//     }, [deliveries]);
+
+//     const handleDeliveryChange = (e) => {
+//         const { name, value } = e.target;
+//         setDelivery(prev => ({ ...prev, [name]: value }));
+//     };
+
+//     const saveDelivery = () => {
+//         if (!delivery.riderIndex || !delivery.date || !delivery.cnNumber || !delivery.consigneeName) {
+//             message.success('Please fill all fields!');
+//             return;
+//         }
+//         setDeliveries([...deliveries, { ...delivery, rider: riders[delivery.riderIndex].name }]);
+//         setDelivery({ riderIndex: '', date: '', cnNumber: '', consigneeName: '' });
+//         message.success('Delivery saved successfully!');
+//     };
+
+//     return (
+//         <main>
+//             <Container>
+//                 <Row>
+//                     <Col>
+//                         <Card>
+//                             <Title level={1}>Make Delivery Sheet</Title>
+//                             <label className="fw-bolder my-2 me-3">Select Rider:</label>
+//                             <Select name="riderIndex" className=" my-2 w-100" value={delivery.riderIndex} onChange={handleDeliveryChange}>
+//                                 <option value="" disabled>Select a rider</option>
+//                                 {riders.map((rider, index) => (
+//                                     <option key={index} value={index}>{rider.name}</option>
+//                                 ))}
+//                             </Select>
+//                             <label className="" >Date:</label>
+//                             <Input type="date" name="date" value={delivery.date} onChange={handleDeliveryChange} />
+//                             <label>CN Number:</label>
+//                             <Input type="text" name="cnNumber" value={delivery.cnNumber} onChange={handleDeliveryChange} />
+//                             <label>Consignee Name:</label>
+//                             <Input type="text" name="consigneeName" value={delivery.consigneeName} onChange={handleDeliveryChange} />
+//                             <Button onClick={saveDelivery}>Save Delivery</Button>
+//                         </Card>
+//                     </Col>
+//                 </Row>
+//             </Container>
+//         </main>
+//     );
 // };
+
+// export default RunSheet;
+
+
+
+import { Button, Card, Col, Input, message, Row, Select, Typography } from "antd";
+import React, { useState, useEffect, useRef } from "react";
+import { Container } from "react-bootstrap";
+
 const RunSheet = () => {
+    const { Title } = Typography;
     const [riders, setRiders] = useState(JSON.parse(localStorage.getItem('riders')) || []);
     const [deliveries, setDeliveries] = useState(JSON.parse(localStorage.getItem('deliveries')) || []);
     const [delivery, setDelivery] = useState({ riderIndex: '', date: '', cnNumber: '', consigneeName: '' });
-  
+    const cnNumberRef = useRef(null); // Ref for the CN Number input field
+
     useEffect(() => {
-      localStorage.setItem('deliveries', JSON.stringify(deliveries));
+        localStorage.setItem('deliveries', JSON.stringify(deliveries));
     }, [deliveries]);
-  
-    const handleDeliveryChange = (e) => {
-      const { name, value } = e.target;
-      setDelivery(prev => ({ ...prev, [name]: value }));
+
+    const handleDeliveryChange = (e, name = null) => {
+        if (name) {
+            setDelivery(prev => ({ ...prev, [name]: e })); // For Select component
+        } else {
+            const { name, value } = e.target; // For Input components
+            setDelivery(prev => ({ ...prev, [name]: value }));
+        }
     };
-  
-    const saveDelivery = () => {
-      if (!delivery.riderIndex || !delivery.date || !delivery.cnNumber || !delivery.consigneeName) {
-        alert('Please fill all fields!');
-        return;
-      }
-      setDeliveries([...deliveries, { ...delivery, rider: riders[delivery.riderIndex].name }]);
-      setDelivery({ riderIndex: '', date: '', cnNumber: '', consigneeName: '' });
-      alert('Delivery saved successfully!');
+
+    const saveDelivery = (e) => {
+        e.preventDefault(); // Prevent page refresh
+        if (!delivery.riderIndex || !delivery.date || !delivery.cnNumber || !delivery.consigneeName) {
+            message.error('Please fill all fields!');
+            return;
+        }
+
+        setDeliveries([...deliveries, { ...delivery, rider: riders[delivery.riderIndex]?.name || "Unknown" }]);
+        setDelivery(prev => ({
+            ...prev,
+            cnNumber: '',
+            consigneeName: '',
+        })); // Reset specific fields
+
+        message.success('Delivery saved successfully!');
+        
+        // Focus back on the CN Number field
+        if (cnNumberRef.current) {
+            cnNumberRef.current.focus();
+        }
     };
-  
+
     return (
-      <div>
-        <h2>Make Delivery Sheet</h2>
-        <label>Select Rider:</label>
-        <select name="riderIndex" value={delivery.riderIndex} onChange={handleDeliveryChange}>
-          <option value="" disabled>Select a rider</option>
-          {riders.map((rider, index) => (
-            <option key={index} value={index}>{rider.name}</option>
-          ))}
-        </select>
-        <label>Date:</label>
-        <input type="date" name="date" value={delivery.date} onChange={handleDeliveryChange} />
-        <label>CN Number:</label>
-        <input type="text" name="cnNumber" value={delivery.cnNumber} onChange={handleDeliveryChange} />
-        <label>Consignee Name:</label>
-        <input type="text" name="consigneeName" value={delivery.consigneeName} onChange={handleDeliveryChange} />
-        <button onClick={saveDelivery}>Save Delivery</button>
-      </div>
+        <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+            <Container>
+                <Row className="d-flex justify-content-center align-items-center">
+                    <Col>
+                        <Card className="border-2 border-bottom border-black">
+                            <Title level={1}>Make Delivery Sheet</Title>
+                            <form onSubmit={saveDelivery}>
+                                <label className="fw-bolder my-2 me-3">Select Rider:</label>
+                                <Select
+                                    name="riderIndex"
+                                    className="my-2 w-100"
+                                    value={delivery.riderIndex}
+                                    onChange={(value) => handleDeliveryChange(value, "riderIndex")}
+                                >
+                                    <option value="" disabled>Select a rider</option>
+                                    {riders.map((rider, index) => (
+                                        <option key={index} value={index}>{rider.name}</option>
+                                    ))}
+                                </Select>
+
+                                <label className="fw-bolder mb-2">Date:</label>
+                                <Input
+                                    type="date"
+                                    className="mb-2"
+                                    name="date"
+                                    value={delivery.date}
+                                    onChange={handleDeliveryChange}
+                                />
+
+                                <label className="mb-2">CN Number:</label>
+                                <Input
+                                    type="text"
+                                    className="mb-2"
+                                    name="cnNumber"
+                                    value={delivery.cnNumber}
+                                    onChange={handleDeliveryChange}
+                                    ref={cnNumberRef} // Attach the ref to this field
+                                />
+
+                                <label className="mb-2">Consignee Name:</label>
+                                <Input
+                                    type="text"
+                                    className="mb-3"
+                                    name="consigneeName"
+                                    value={delivery.consigneeName}
+                                    onChange={handleDeliveryChange}
+                                />
+
+                                <Button type="primary" htmlType="submit">Save Delivery</Button>
+                            </form>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
+        </main>
     );
-  };
+};
 
 export default RunSheet;
-
-

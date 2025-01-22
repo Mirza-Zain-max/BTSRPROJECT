@@ -228,10 +228,10 @@
 // export default ViewSheet;
 
 
-import { Card, Col, Row, Table } from "antd";
-import jsPDF from "jspdf";
-import React, { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
+// import { Card, Col, Row, Table } from "antd";
+// import jsPDF from "jspdf";
+// import React, { useEffect, useState } from "react";
+// import { Container } from "react-bootstrap";
 
 // const ViewSheet = () => {
 //   const [riderData, setRiderData] = useState([]);
@@ -289,6 +289,10 @@ import { Container } from "react-bootstrap";
 //     </main>
 //   );
 // };
+import { Card, Col, Row, Table } from "antd";
+import jsPDF from "jspdf";
+import React, { useEffect, useState } from "react";
+import { Container } from "react-bootstrap";
 const ViewSheet = () => {
   const [riders, setRiders] = useState(JSON.parse(localStorage.getItem('riders')) || []);
   const [deliveries, setDeliveries] = useState(JSON.parse(localStorage.getItem('deliveries')) || []);
@@ -320,41 +324,51 @@ const ViewSheet = () => {
   };
 
   return (
-    <div>
-      <h2>View Delivery Sheet</h2>
-      <label>Select Rider:</label>
-      <select name="riderIndex" value={delivery.riderIndex} onChange={handleDeliveryChange}>
-        <option value="" disabled>Select a rider</option>
-        {riders.map((rider, index) => (
-          <option key={index} value={index}>{rider.name}</option>
-        ))}
-      </select>
-      <label>Select Date:</label>
-      <input type="date" name="date" value={delivery.date} onChange={handleDeliveryChange} />
-      <button onClick={viewDeliverySheet}>View Delivery Sheet</button>
+    <main>
+      <Container>
+        <Row>
+          <Col>
+            <Card>
 
-      {deliverySheetData.length > 0 && (
-        <div>
-          <table id="deliverySheet">
-            <thead>
-              <tr>
-                <th>CN Number</th>
-                <th>Consignee Name</th>
-              </tr>
-            </thead>
-            <tbody>
-              {deliverySheetData.map((delivery, index) => (
-                <tr key={index}>
-                  <td>{delivery.cnNumber}</td>
-                  <td>{delivery.consigneeName}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button onClick={downloadPDFSheet}>Download as PDF</button>
-        </div>
-      )}
-    </div>
+              <h2>View Delivery Sheet</h2>
+              <label>Select Rider:</label>
+              <select name="riderIndex" value={delivery.riderIndex} onChange={handleDeliveryChange}>
+                <option value="" disabled>Select a rider</option>
+                {riders.map((rider, index) => (
+                  <option key={index} value={index}>{rider.name}</option>
+                ))}
+              </select>
+              <label>Select Date:</label>
+              <input type="date" name="date" value={delivery.date} onChange={handleDeliveryChange} />
+              <button onClick={viewDeliverySheet}>View Delivery Sheet</button>
+
+              {deliverySheetData.length > 0 && (
+                <div>
+                  <table id="deliverySheet">
+                    <thead>
+                      <tr>
+                        <th>CN Number</th>
+                        <th>Consignee Name</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {deliverySheetData.map((delivery, index) => (
+                        <tr key={index}>
+                          <td>{delivery.cnNumber}</td>
+                          <td>{delivery.consigneeName}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <button onClick={downloadPDFSheet}>Download as PDF</button>
+                </div>
+              )}
+
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </main>
   );
 };
 

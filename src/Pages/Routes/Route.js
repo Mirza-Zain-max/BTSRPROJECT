@@ -12,6 +12,7 @@ import ViewSheet from '../DashBoard/ViewSheet';
 import RunSheet from '../DashBoard/RunSheet';
 import TrackShipment from '../DashBoard/Tracking';
 import Download from '../DashBoard/Download';
+import ShowData from '../DashBoard/ShowData';
 // import Tracking from '../DashBoard/Tracking';
 
 const FrontEnd = () => {
@@ -28,9 +29,9 @@ const FrontEnd = () => {
         <Route path='/viewSheet' element={<ViewSheet/>}/>
         <Route path='/upDate' element={<UpdateShipment/>}/>
         <Route path='/cPage' element={<CPage/>}/>
-        <Route path='/showData' element={<ShowData/>}/>
-    </Routes> */}
+        </Routes> */}
      <Routes>
+        <Route path='/showData' element={<ShowData/>}/>
           <Route path="/" element={<AddRider />} />
           <Route path="/make-delivery" element={<RunSheet />} />
           <Route path="/track-shipment" element={<TrackShipment />} />
