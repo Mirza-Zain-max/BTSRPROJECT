@@ -282,12 +282,115 @@
 
 // export default TrackShipment;
 
+// import { Button, Card, Col, Input, message, Row, Typography } from "antd";
+// import React, { useState } from "react";
+// import { Container, Table } from "react-bootstrap";
+
+// const TrackShipment = () => {
+//     const [deliveries, setDeliveries] = useState(JSON.parse(localStorage.getItem('deliveries')) || []);
+//         const [riders, setRiders] = useState(JSON.parse(localStorage.getItem("riders")) || []);
+//     const { Title } = Typography;
+//     const [trackCN, setTrackCN] = useState('');
+//     const [trackResult, setTrackResult] = useState(null);
+
+//     const handleTrackCNChange = (e) => {
+//         setTrackCN(e.target.value);
+//     };
+
+//     const trackShipment = () => {
+//         if (!trackCN.trim()) {
+//             message.warning("Please enter a CN Number.");
+//             return;
+//         }
+        
+//         const result = deliveries.find(delivery => delivery.cnNumber === trackCN.trim());
+//         if (result) {
+//             setTrackResult(result);
+//             message.success("Delivery found successfully!");
+//         } else {
+//             setTrackResult(null);
+//             message.error("No delivery found with this CN Number.");
+//         }
+//     };
+
+//     const handleKeyPress = (event) => {
+//         if (event.key === "Enter") {
+//             trackShipment();
+//         }
+//     };
+
+//     return (
+//         <main style={{ height: "100vh" }} className="d-flex justify-content-center align-items-center">
+//             <Container>
+//                 <Row className="d-flex justify-content-center align-items-center">
+//                     <Col span={24}>
+//                         <Card>
+//                             <Title level={1}>Track Shipment</Title>
+//                             <label className="fw-bolder mb-4">Enter CN Number:</label>
+//                             <Input
+//                                 className="mb-4"
+//                                 type="text"
+//                                 value={trackCN}
+//                                 onChange={handleTrackCNChange}
+//                                 onKeyDown={handleKeyPress}
+//                                 placeholder="Enter CN Number"
+//                             />
+//                             <Button
+//                                 className="w-25 p-3"
+//                                 type="primary"
+//                                 onClick={trackShipment}
+//                             >
+//                                 Track
+//                             </Button>
+
+//                             {trackResult ? (
+//                                 <Table
+//                                     border="3"
+//                                     bordered
+//                                     style={{ marginTop: '20px', width: '100%', textAlign: 'left' }}
+//                                 >
+//                                     <thead>
+//                                         <tr>
+//                                             <th>Rider</th>
+//                                             <th>Date</th>
+//                                             <th>CN Number</th>
+//                                             <th>Consignee Name</th>
+//                                             <th>Receiver Name</th>
+//                                         </tr>
+//                                     </thead>
+//                                     <tbody>
+//                                         <tr>
+//                                             <td>{trackResult.rider}</td>
+//                                             <td>{trackResult.date}</td>
+//                                             <td>{trackResult.cnNumber}</td>
+//                                             <td>{trackResult.consigneeName}</td>
+//                                             <td></td> {/* Placeholder for Receiver Name */}
+//                                         </tr>
+//                                     </tbody>
+//                                 </Table>
+//                             ) : trackCN && (
+//                                 <p style={{ color: 'red', marginTop: '20px' }}>
+//                                     No delivery found with this CN Number.
+//                                 </p>
+//                             )}
+//                         </Card>
+//                     </Col>
+//                 </Row>
+//             </Container>
+//         </main>
+//     );
+// };
+
+// export default TrackShipment;
+
+
 import { Button, Card, Col, Input, message, Row, Typography } from "antd";
 import React, { useState } from "react";
 import { Container, Table } from "react-bootstrap";
 
 const TrackShipment = () => {
     const [deliveries, setDeliveries] = useState(JSON.parse(localStorage.getItem('deliveries')) || []);
+    const [riders, setRiders] = useState(JSON.parse(localStorage.getItem("riders")) || []);
     const { Title } = Typography;
     const [trackCN, setTrackCN] = useState('');
     const [trackResult, setTrackResult] = useState(null);
@@ -301,10 +404,11 @@ const TrackShipment = () => {
             message.warning("Please enter a CN Number.");
             return;
         }
-
+        
         const result = deliveries.find(delivery => delivery.cnNumber === trackCN.trim());
         if (result) {
-            setTrackResult(result);
+            const rider = riders.find(r => r.id === result.ridername);
+            setTrackResult({ ...result, riderName: rider ? rider.name : "Unknown" });
             message.success("Delivery found successfully!");
         } else {
             setTrackResult(null);
@@ -359,11 +463,11 @@ const TrackShipment = () => {
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>{trackResult.rider}</td>
+                                            <td>{trackResult.riderName}</td>
                                             <td>{trackResult.date}</td>
                                             <td>{trackResult.cnNumber}</td>
                                             <td>{trackResult.consigneeName}</td>
-                                            <td></td> {/* Placeholder for Receiver Name */}
+                                            <td>{trackResult.receiverName}</td>
                                         </tr>
                                     </tbody>
                                 </Table>

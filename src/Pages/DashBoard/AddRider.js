@@ -197,7 +197,7 @@ const AddRider = () => {
         }
         const riderIndex = riders.findIndex(rider => rider.name === newRider.name);
         if (riderIndex === -1) {
-            message.success('Rider not found!');
+            message.error('Rider not found!');
             return;
         }
         const updatedRiders = [...riders];

@@ -1170,6 +1170,113 @@
 
 
 
+// import { Button, Card, Col, Input, message, Row, Select, Typography } from "antd";
+// import React, { useState, useEffect, useRef } from "react";
+// import { Container } from "react-bootstrap";
+
+// const RunSheet = () => {
+//     const { Title } = Typography;
+//     const [riders, setRiders] = useState(JSON.parse(localStorage.getItem('riders')) || []);
+//     const [deliveries, setDeliveries] = useState(JSON.parse(localStorage.getItem('deliveries')) || []);
+//     const [delivery, setDelivery] = useState({ riderIndex: '', date: '', cnNumber: '', consigneeName: '' });
+//     const cnNumberRef = useRef(null); // Ref for the CN Number input field
+
+//     useEffect(() => {
+//         localStorage.setItem('deliveries', JSON.stringify(deliveries));
+//     }, [deliveries]);
+
+//     const handleDeliveryChange = (e, name = null) => {
+//         if (name) {
+//             setDelivery(prev => ({ ...prev, [name]: e })); // For Select component
+//         } else {
+//             const { name, value } = e.target; // For Input components
+//             setDelivery(prev => ({ ...prev, [name]: value }));
+//         }
+//     };
+
+//     const saveDelivery = (e) => {
+//         e.preventDefault(); // Prevent page refresh
+//         if (!delivery.riderIndex || !delivery.date || !delivery.cnNumber || !delivery.consigneeName) {
+//             message.error('Please fill all fields!');
+//             return;
+//         }
+
+//         setDeliveries([...deliveries, { ...delivery, rider: riders[delivery.riderIndex]?.name || "Unknown" }]);
+//         setDelivery(prev => ({
+//             ...prev,
+//             cnNumber: '',
+//             consigneeName: '',
+//         })); // Reset specific fields
+
+//         message.success('Delivery saved successfully!');
+        
+//         // Focus back on the CN Number field
+//         if (cnNumberRef.current) {
+//             cnNumberRef.current.focus();
+//         }
+//     };
+
+//     return (
+//         <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+//             <Container>
+//                 <Row className="d-flex justify-content-center align-items-center">
+//                     <Col>
+//                         <Card className="border-2 border-bottom border-black">
+//                             <Title level={1}>Make Delivery Sheet</Title>
+//                             <form onSubmit={saveDelivery}>
+//                                 <label className="fw-bolder my-2 me-3">Select Rider:</label>
+//                                 <Select
+//                                     name="riderIndex"
+//                                     className="my-2 w-100"
+//                                     value={delivery.riderIndex}
+//                                     onChange={(value) => handleDeliveryChange(value, "riderIndex")}
+//                                 >
+//                                     <option value="" disabled>Select a rider</option>
+//                                     {riders.map((rider, index) => (
+//                                         <option key={index} value={index}>{rider.name}</option>
+//                                     ))}
+//                                 </Select>
+
+//                                 <label className="fw-bolder mb-2">Date:</label>
+//                                 <Input
+//                                     type="date"
+//                                     className="mb-2"
+//                                     name="date"
+//                                     value={delivery.date}
+//                                     onChange={handleDeliveryChange}
+//                                 />
+
+//                                 <label className="mb-2">CN Number:</label>
+//                                 <Input
+//                                     type="text"
+//                                     className="mb-2"
+//                                     name="cnNumber"
+//                                     value={delivery.cnNumber}
+//                                     onChange={handleDeliveryChange}
+//                                     ref={cnNumberRef} // Attach the ref to this field
+//                                 />
+
+//                                 <label className="mb-2">Consignee Name:</label>
+//                                 <Input
+//                                     type="text"
+//                                     className="mb-3"
+//                                     name="consigneeName"
+//                                     value={delivery.consigneeName}
+//                                     onChange={handleDeliveryChange}
+//                                 />
+
+//                                 <Button type="primary" htmlType="submit">Save Delivery</Button>
+//                             </form>
+//                         </Card>
+//                     </Col>
+//                 </Row>
+//             </Container>
+//         </main>
+//     );
+// };
+
+// export default RunSheet;
+
 import { Button, Card, Col, Input, message, Row, Select, Typography } from "antd";
 import React, { useState, useEffect, useRef } from "react";
 import { Container } from "react-bootstrap";
@@ -1178,7 +1285,7 @@ const RunSheet = () => {
     const { Title } = Typography;
     const [riders, setRiders] = useState(JSON.parse(localStorage.getItem('riders')) || []);
     const [deliveries, setDeliveries] = useState(JSON.parse(localStorage.getItem('deliveries')) || []);
-    const [delivery, setDelivery] = useState({ riderIndex: '', date: '', cnNumber: '', consigneeName: '' });
+    const [delivery, setDelivery] = useState({ date: '', cnNumber: '', consigneeName: '' });
     const cnNumberRef = useRef(null); // Ref for the CN Number input field
 
     useEffect(() => {
@@ -1187,29 +1294,35 @@ const RunSheet = () => {
 
     const handleDeliveryChange = (e, name = null) => {
         if (name) {
-            setDelivery(prev => ({ ...prev, [name]: e })); // For Select component
+            setDelivery((prev) => ({ ...prev, [name]: e })); // For Select component
         } else {
             const { name, value } = e.target; // For Input components
-            setDelivery(prev => ({ ...prev, [name]: value }));
+            setDelivery((prev) => ({ ...prev, [name]: value }));
         }
     };
 
     const saveDelivery = (e) => {
         e.preventDefault(); // Prevent page refresh
-        if (!delivery.riderIndex || !delivery.date || !delivery.cnNumber || !delivery.consigneeName) {
+        if ( !delivery.date || !delivery.cnNumber || !delivery.consigneeName) {
             message.error('Please fill all fields!');
             return;
         }
 
-        setDeliveries([...deliveries, { ...delivery, rider: riders[delivery.riderIndex]?.name || "Unknown" }]);
-        setDelivery(prev => ({
+        const newDelivery = {
+            ...delivery,
+            // riderId: riders[delivery.riderId]?.id || "Unknown", // Store riderId instead of index
+            riderName: riders[delivery.riderId]?.name || "Unknown", // Add rider name for display
+        };
+
+        setDeliveries([...deliveries, newDelivery]);
+        setDelivery((prev) => ({
             ...prev,
             cnNumber: '',
             consigneeName: '',
         })); // Reset specific fields
 
         message.success('Delivery saved successfully!');
-        
+
         // Focus back on the CN Number field
         if (cnNumberRef.current) {
             cnNumberRef.current.focus();
@@ -1226,10 +1339,10 @@ const RunSheet = () => {
                             <form onSubmit={saveDelivery}>
                                 <label className="fw-bolder my-2 me-3">Select Rider:</label>
                                 <Select
-                                    name="riderIndex"
+                                    name="riderId"
                                     className="my-2 w-100"
-                                    value={delivery.riderIndex}
-                                    onChange={(value) => handleDeliveryChange(value, "riderIndex")}
+                                    value={delivery.riderId}
+                                    onChange={(value) => handleDeliveryChange(value, "riderId")}
                                 >
                                     <option value="" disabled>Select a rider</option>
                                     {riders.map((rider, index) => (
@@ -1248,7 +1361,7 @@ const RunSheet = () => {
 
                                 <label className="mb-2">CN Number:</label>
                                 <Input
-                                    type="text"
+                                    type="number"
                                     className="mb-2"
                                     name="cnNumber"
                                     value={delivery.cnNumber}
