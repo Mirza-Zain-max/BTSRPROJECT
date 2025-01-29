@@ -1,9 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { auth, fireStore } from 'Components/Config/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { message } from 'antd';
-import Screenloader from '../FrontEnd/Screenloader';
 import { doc, getDoc } from 'firebase/firestore';
+import ScreenLoader from '../Pages/ScreenLoader/ScreenLoader';
+import { auth, fireStore } from '../Config/firebase';
 
 const AuthContext = createContext({
     isAuth: false, user: {},
@@ -65,7 +65,7 @@ const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{ ...state, isAppLoading, dispatch, handleLogout }}>
-            {isAppLoading ? <Screenloader /> : children}
+            {isAppLoading ? <ScreenLoader /> : children}
         </AuthContext.Provider>
     );
 };
