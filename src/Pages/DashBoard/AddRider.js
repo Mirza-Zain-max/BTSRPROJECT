@@ -1,209 +1,82 @@
-// import { Card, Form, Input, message } from "antd";
-// import React, { useState } from "react";
-// import { Button } from "react-bootstrap";
-
-// const AddRider = () => {
-//     const [form, setForm] = useState({ name: "", contact: "", address: "" });
-//     const handleChange = (e) => { const { name, value } = e.target; setForm({ ...form, [name]: value }); };
-//     const handleAddCourier = () => {
-//         const { name, contact, address } = form;
-//         if (name && contact && address) {
-//             const timestamp = new Date().toISOString(); // Current date and time
-//             const savedCouriers = localStorage.getItem("couriers");
-//             const couriers = savedCouriers ? JSON.parse(savedCouriers) : [];
-//             const updatedCouriers = [
-//                 ...couriers,
-//                 { ...form, createdAt: timestamp },
-//             ];
-//             localStorage.setItem("couriers", JSON.stringify(updatedCouriers));
-//             setForm({ name: "", contact: "", address: "" });
-//             message.success("Rider created successfully!");
-//         } else {
-//             message.error("Please fill all fields!");
-//         }
-//     };
-//     const handleKeyPress = (event, nextField) => {
-//         if (event.key === "Enter") {
-//           event.preventDefault(); // Prevent form submission
-//           const nextInput = document.querySelector(`[name="${nextField}"]`);
-//           if (nextInput) {
-//             nextInput.focus(); // Move focus to the next input field
-//           } else if (nextField === "submit") {
-//             handleAddCourier(); // Submit form if last input
-//           }
-//         }
-//       };
-
-//     return (
-//         <main style={{ height: "100vh" }} className="d-flex justify-content-center align-items-center">
-//             <div className="Rider">
-//                 <h1 className="display-5 ">Add Rider</h1>
-//                 <Form>
-//                     <Card className="border-2 border-bottom border-black">
-//                         <label>
-//                             <span className="fw-bolder fs-6"> Rider Name</span>
-//                         </label>
-//                         <Input className="my-2 border-2 rounded-2" type="text" name="name" placeholder="Rider Name" value={form.name} onKeyDown={(e)=>handleKeyPress(e,'contact')} onChange={handleChange} />
-//                         <label>
-//                             <span className="fw-bolder fs-6"> Rider Contact</span>
-//                         </label>
-//                         <Input className="my-2 border-2 rounded-2" type="number" name="contact" placeholder="Rider Contact" value={form.contact} onKeyDown={(e)=>handleKeyPress(e,'address')} onChange={handleChange} />
-//                         <label>
-//                             <span className="fw-bolder fs-6"> Address</span>
-//                         </label>
-//                         <Input className="my-2 border-2 rounded-2" type="text" name="address" placeholder="Address" value={form.address} onKeyDown={(e)=>handleKeyPress(e,'submit')} onChange={handleChange} />
-//                         {/* <label>
-//                             <span className="fw-bolder fs-6"> Consignee Number</span>
-//                         </label>
-//                         <Input className="my-2 border-2 rounded-2" type="text" name="consigneeNumber" placeholder="Consignee Number" value={form.consigneeNumber} onKeyDown={(e)=>handleKeyPress(e,'reciverName')} onChange={handleChange} />
-//                         <label>
-//                             <span className="fw-bolder fs-6">Reciver Name</span>
-//                         </label>
-//                         <Input className="my-2 border-2 rounded-2" type="text" name="reciverName" placeholder="Reciver Name" value={form.reciverName} onKeyDown={(e)=>handleKeyPress(e,'submit')} onChange={handleChange} /> */}
-//                         <div className="d-flex justify-content-center align-items-center">
-//                             <Button className="btn btn-success justify-content-center w-50 align-items-center d-flex" onClick={handleAddCourier}>Add Rider</Button>
-//                         </div>
-//                     </Card>
-//                 </Form>
-//             </div>
-//         </main>
-//     );
-// };
-// export default AddRider;
-
-
-// import React, { useEffect, useState } from "react";
-
-// const AddRider = () => {
-// const [form, setForm] = useState({ name: "", contact: "", address: "" });
-
-// const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setForm({ ...form, [name]: value });
-// };
-
-// const handleAddCourier = () => {
-//     const { name, contact, address } = form;
-//     if (name && contact && address) {
-//         const savedCouriers = localStorage.getItem("couriers");
-//         const couriers = savedCouriers ? JSON.parse(savedCouriers) : [];
-
-//         if (couriers.some((rider) => rider.name.toLowerCase() === name.toLowerCase())) {
-//             message.error("Rider already exists!");
-//             return;
-//         }
-
-//         const newRider = {
-//             id: Date.now(), // Unique ID for the rider
-//             name,
-//             contact,
-//             address,
-//             createdAt: new Date().toISOString(),
-//         };
-
-//         couriers.push(newRider);
-//         localStorage.setItem("couriers", JSON.stringify(couriers));
-//         setForm({ name: "", contact: "", address: "" });
-//         message.success("Rider created successfully!");
-//     } else {
-//         message.error("Please fill all fields!");
-//     }
-// };
-
-// return (
-//     <main style={{ height: "100vh" }} className="d-flex justify-content-center align-items-center">
-//         <div>
-//             <h1 className="display-5">Add Rider</h1>
-//             <Form>
-//                 <Card className="border-2 border-bottom border-black">
-//                     <label>
-//                         <span className="fw-bolder fs-6">Rider Name</span>
-//                     </label>
-//                     <Input
-//                         className="my-2 border-2 rounded-2"
-//                         type="text"
-//                         name="name"
-//                         placeholder="Rider Name"
-//                         value={form.name}
-//                         onChange={handleChange}
-//                     />
-//                     <label>
-//                         <span className="fw-bolder fs-6">Rider Contact</span>
-//                     </label>
-//                     <Input
-//                         className="my-2 border-2 rounded-2"
-//                         type="text"
-//                         name="contact"
-//                         placeholder="Rider Contact"
-//                         value={form.contact}
-//                         onChange={handleChange}
-//                     />
-//                     <label>
-//                         <span className="fw-bolder fs-6">Address</span>
-//                     </label>
-//                     <Input
-//                         className="my-2 border-2 rounded-2"
-//                         type="text"
-//                         name="address"
-//                         placeholder="Address"
-//                         value={form.address}
-//                         onChange={handleChange}
-//                     />
-//                     <div className="d-flex justify-content-center align-items-center">
-//                         <Button
-//                             className="btn btn-success w-50"
-//                             onClick={handleAddCourier}
-//                         >
-//                             Add Rider
-//                         </Button>
-//                     </div>
-//                 </Card>
-//             </Form>
-//         </div>
-//     </main>
-
 import { Button, Card, Col, Input, message, Row, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
+// import { fireStore } from "../firebase"; // Adjust the import path as needed
+import { collection, addDoc, deleteDoc, doc, getDocs, query} from "firebase/firestore";
+import { fireStore } from "../../Config/firebase";
 
 const AddRider = () => {
-    const { Title, Paragraph } = Typography;
-    const [newRider, setNewRider] = useState({ name: '', contact: '', address: '' });
-    const [riders, setRiders] = useState(JSON.parse(localStorage.getItem('riders')) || []);
+    const { Title } = Typography;
+    const [newRider, setNewRider] = useState({ name: "", contact: "", address: "" });
+    const [riders, setRiders] = useState([]);
 
     useEffect(() => {
-        localStorage.setItem('riders', JSON.stringify(riders));
-    }, [riders]);
+        const fetchRiders = async () => {
+            const q = query(collection(fireStore, "riders"));
+            const querySnapshot = await getDocs(q);
+            const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setRiders(ridersList);
+        };
+
+        fetchRiders();
+    }, []);
 
     const handleRiderChange = (e) => {
         const { name, value } = e.target;
-        setNewRider(prev => ({ ...prev, [name]: value }));
+        setNewRider((prev) => ({ ...prev, [name]: value }));
     };
 
-    const saveRider = () => {
+    const saveRider = async () => {
         if (!newRider.name || !newRider.contact || !newRider.address) {
-            message.error('Please fill all fields!');
+            message.error("Please fill all fields!");
             return;
         }
-        setRiders([...riders, newRider]);
-        setNewRider({ name: '', contact: '', address: '' });
-        message.success('Rider added successfully!');
+
+        // Check if a rider with the same name already exists
+        const duplicate = riders.find((rider) => rider.name.toLowerCase() === newRider.name.toLowerCase());
+        if (duplicate) {
+            message.error("Rider with this name already exists!");
+            return;
+        }
+
+        try {
+            const docRef = await addDoc(collection(fireStore, "riders"), newRider);
+            setRiders((prevRiders) => [...prevRiders, { id: docRef.id, ...newRider }]);
+            setNewRider({ name: "", contact: "", address: "" });
+            message.success("Rider added successfully!");
+        } catch (e) {
+            console.error("Error adding document: ", e);
+            message.error("Error adding rider!");
+        }
     };
 
-    const deleteRider = () => {
+    const deleteRider = async () => {
         if (!newRider.name) {
-            message.error('Please enter rider name to delete.');
+            message.error("Please enter rider name to delete.");
             return;
         }
-        const riderIndex = riders.findIndex(rider => rider.name === newRider.name);
-        if (riderIndex === -1) {
-            message.error('Rider not found!');
+
+        const riderToDelete = riders.find(
+            (rider) => rider.name.toLowerCase() === newRider.name.toLowerCase()
+        );
+
+        if (!riderToDelete) {
+            message.error("Rider not found!");
             return;
         }
-        const updatedRiders = [...riders];
-        updatedRiders.splice(riderIndex, 1);
-        setRiders(updatedRiders);
-        message.success('Rider deleted successfully!');
+
+        try {
+            await deleteDoc(doc(fireStore, "riders", riderToDelete.id));
+            setRiders(riders.filter((rider) => rider.id !== riderToDelete.id));
+            setNewRider({ name: "", contact: "", address: "" });
+            message.success("Rider deleted successfully!");
+        } catch (e) {
+            console.error("Error deleting document: ", e);
+            message.error("Error deleting rider!");
+        } finally{
+            console.log("done");
+            message.success("Rider deleted successfully !");
+        }
     };
 
     return (
@@ -214,13 +87,46 @@ const AddRider = () => {
                         <Title level={1}>Add Rider</Title>
                         <Card className="p-4 my-4 border-black">
                             <label>Rider Name:</label>
-                            <Input type="text" className="my-2"  name="name" value={newRider.name} onChange={handleRiderChange} placeholder="Enter rider name" />
+                            <Input
+                                type="text"
+                                className="my-2"
+                                name="name"
+                                value={newRider.name}
+                                onChange={handleRiderChange}
+                                placeholder="Enter rider name"
+                            />
                             <label>Contact Number:</label>
-                            <Input type="text" className="my-2" name="contact" value={newRider.contact} onChange={handleRiderChange} placeholder="Enter contact number" />
+                            <Input
+                                type="number"
+                                className="my-2"
+                                name="contact"
+                                value={newRider.contact}
+                                onChange={handleRiderChange}
+                                placeholder="Enter contact number"
+                            />
                             <label>Address:</label>
-                            <Input type="text" className="my-2" name="address" value={newRider.address} onChange={handleRiderChange} placeholder="Enter address" />
-                            <Button  className="me-2 mt-2" style={{backgroundColor: "Green" , color: " #fff"}} onClick={saveRider}>Save Rider</Button>
-                            <Button className="me-2 mt-2 bg-danger"  style={{ color: " #fff"}} onClick={deleteRider}>Delete Rider</Button>
+                            <Input
+                                type="text"
+                                className="my-2"
+                                name="address"
+                                value={newRider.address}
+                                onChange={handleRiderChange}
+                                placeholder="Enter address"
+                            />
+                            <Button
+                                className="me-2 mt-2"
+                                style={{ backgroundColor: "Green", color: "#fff" }}
+                                onClick={saveRider}
+                            >
+                                Save Rider
+                            </Button>
+                            <Button
+                                className="me-2 mt-2 bg-danger"
+                                style={{ color: "#fff" }}
+                                onClick={deleteRider}
+                            >
+                                Delete Rider
+                            </Button>
                         </Card>
                     </Col>
                 </Row>
@@ -229,5 +135,166 @@ const AddRider = () => {
     );
 };
 
-
 export default AddRider;
+
+// import React, { useEffect, useState } from "react";
+// import { Button, Card, Col, Input, message, Row, Typography } from "antd";
+// import { Container } from "react-bootstrap";
+// import { fireStore } from "../../Config/firebase";
+// import { addDoc, collection, deleteDoc, doc, getDocs, query } from "firebase/firestore";
+// import { RouterProvider } from "react-router-dom";
+
+// const AddRider = () => {
+//     const { Title } = Typography;
+//     const [newRider, setNewRider] = useState({ name: "", contact: "", address: "" });
+//     // const [riders, setRiders] = useState(JSON.parse(localStorage.getItem("riders")) || []);
+//     const [riders, setRiders] = useState([]);
+
+//     // useEffect(() => {
+//     //     // Sync riders with local storage whenever the riders state changes
+//     //     localStorage.setItem("riders", JSON.stringify(riders));
+//     // }, [riders]);
+
+
+//     useEffect(() => {
+//         const fetchRiders = async () => {
+//             const q = query(collection(fireStore, "riders"));
+//             const querySnapshot = await getDocs(q);
+//             const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+//             setRiders(ridersList);
+//         };
+//         fetchRiders();
+//     }, []);
+
+//     function handleRiderChange(e) {
+//         const { name, value } = e.target;
+//         setNewRider((prev) => ({ ...prev, [name]: value }));
+//     }
+
+//     const saveRider = async () => {
+//         if (!newRider.name || !newRider.contact || !newRider.address) {
+//             message.error("Please fill all fields!");
+//             return;
+//         }
+
+//         // Check if a rider with the same name already exists
+//         const duplicate = riders.find((rider) => rider.name.toLowerCase() === newRider.name.toLowerCase());
+//         if (duplicate) {
+//             message.error("Rider with this name already exists!");
+//             return;
+//         }
+//         try {
+//             const docRef = await addDoc(collection(fireStore, "riders"), newRider);
+//             console.log("Document written with ID: ", docRef.id);
+//             setRiders((prevRiders) => [...prevRiders, { id: docRef.id, ...newRider }]);
+//             setNewRider({ name: "", contact: "", address: "" });
+//             message.success("Rider added successfully!");
+//         } catch (e) {
+//             console.error("Error adding document: ", e);
+//             message.error("Error adding rider!");
+//         } finally {
+//             console.log("done");
+//             message.success("Rider added successfully!");
+//         }
+
+
+//         // Create a unique ID for the rider
+//         // const newRiderData = { ...newRider, id: Date.now().toString() };
+//         // setRiders((prevRiders) => [...prevRiders, newRiderData]);
+
+//         // Reset the input fields
+//         // setNewRider({ name: "", contact: "", address: "" });
+//         // message.success("Rider added successfully!");
+//     };
+
+//     const deleteRider = async () => {
+//         if (!newRider.name) {
+//             message.error("Please enter rider name to delete.");
+//             return;
+//         }
+
+//         // Remove the rider by name
+//         const riderToDelete = riders.filter(
+//             (rider) => rider.name.toLowerCase() !== newRider.name.toLowerCase()
+//         );
+
+//         if (!riderToDelete) {
+//             message.error("Rider not found!");
+//             return;
+//         } try {
+//             await deleteDoc(doc(fireStore, "riders", riderToDelete.id));
+//             setRiders(riders.filter((rider) => RouterProvider.id !== riderToDelete.id));
+//             setNewRider({ name: "", contact: "", address: "" });
+//             message.success("Rider deleted successfully!");
+//         } catch (e) {
+//             console.error("Error deleting document: ", e);
+//             message.error("Error deleting rider!");
+//         } finally {
+//             console.log("done");
+//             message.success("Rider deleted successfully!");
+//         }
+
+//         // setRiders(updatedRiders);
+
+//         // Reset the input fields
+//         // setNewRider({ name: "", contact: "", address: "" });
+//         // message.success("Rider deleted successfully!");
+//     };
+
+//     return (
+//         <main style={{ height: "100vh" }} className="d-flex justify-content-center align-items-center">
+//             <Container>
+//                 <Row className="d-flex justify-content-center align-items-center">
+//                     <Col>
+//                         <Title level={1}>Add Rider</Title>
+//                         <Card className="p-4 my-4 border-black">
+//                             <label>Rider Name:</label>
+//                             <Input
+//                                 type="text"
+//                                 className="my-2"
+//                                 name="name"
+//                                 value={newRider.name}
+//                                 onChange={handleRiderChange}
+//                                 placeholder="Enter rider name"
+//                             />
+//                             <label>Contact Number:</label>
+//                             <Input
+//                                 type="text"
+//                                 className="my-2"
+//                                 name="contact"
+//                                 value={newRider.contact}
+//                                 onChange={handleRiderChange}
+//                                 placeholder="Enter contact number"
+//                             />
+//                             <label>Address:</label>
+//                             <Input
+//                                 type="text"
+//                                 className="my-2"
+//                                 name="address"
+//                                 value={newRider.address}
+//                                 onChange={handleRiderChange}
+//                                 placeholder="Enter address"
+//                             />
+//                             <Button
+//                                 className="me-2 mt-2"
+//                                 style={{ backgroundColor: "Green", color: "#fff" }}
+//                                 onClick={saveRider}
+//                             >
+//                                 Save Rider
+//                             </Button>
+//                             <Button
+//                                 className="me-2 mt-2 bg-danger"
+//                                 style={{ color: "#fff" }}
+//                                 onClick={deleteRider}
+//                             >
+//                                 Delete Rider
+//                             </Button>
+//                         </Card>
+//                     </Col>
+//                 </Row>
+//             </Container>
+//         </main>
+//     );
+// };
+
+// export default AddRider;

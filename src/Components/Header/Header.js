@@ -36,8 +36,8 @@ function Header1() {
             <hr />
             <Link className='text-dark nav-link  text-center my-2 p-1 ' to="/view-sheet">View Sheet</Link>
             <hr />
-            <Link className='text-dark nav-link  text-center my-2 p-1 ' to="/download-upload">Download</Link>
-            <hr />
+            {/* <Link className='text-dark nav-link  text-center my-2 p-1 ' to="/download-upload">Download</Link> */}
+            {/* <hr /> */}
             <Link className='text-dark nav-link  text-center my-2 p-1 ' to='/showData'>Show Data</Link>
 
           </NavDropdown>

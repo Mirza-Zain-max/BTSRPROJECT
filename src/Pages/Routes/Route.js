@@ -18,8 +18,8 @@ import ShowData from '../DashBoard/ShowData';
 const FrontEnd = () => {
   return (
     <>
-    <Header1/>
-    {/* <Routes>
+      <Header1 />
+      {/* <Routes>
         <Route path='/*' element={<Index/>}/> 
         <Route path='/' element={<AddRider/>}/>
         <Route path='/tracking' element={<Tracking/>}/>
@@ -30,15 +30,15 @@ const FrontEnd = () => {
         <Route path='/upDate' element={<UpdateShipment/>}/>
         <Route path='/cPage' element={<CPage/>}/>
         </Routes> */}
-     <Routes>
-        <Route path='/showData' element={<ShowData/>}/>
-          <Route path="/" element={<AddRider />} />
-          <Route path="/make-delivery" element={<RunSheet />} />
-          <Route path="/track-shipment" element={<TrackShipment />} />
-          <Route path="/view-sheet" element={<ViewSheet />} />
-          <Route path="/download-upload" element={<Download />} />
-          {/* <Route path="/" element={<Home />} /> */}
-        </Routes>
+      <Routes>
+        <Route path="/" element={<AddRider />} />
+        <Route path='/showData' element={<ShowData />} />
+        <Route path="/make-delivery" element={<RunSheet />} />
+        <Route path="/track-shipment" element={<TrackShipment />} />
+        <Route path="/view-sheet" element={<ViewSheet />} />
+        <Route path="/download-upload" element={<Download />} />
+        {/* <Route path="/" element={<Home />} /> */}
+      </Routes>
     </>
   )
 }

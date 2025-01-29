@@ -1,510 +1,97 @@
-// import { Table, Card, Select, DatePicker, Row, Col, Input, Button, message } from "antd";
+// import { Table, Card, Select, DatePicker, Row, Col, Button, Input, message } from "antd";
 // import React, { useState, useEffect, useRef } from "react";
 // import { Container } from "react-bootstrap";
+// import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
+// import { collection, getDocs, query } from "firebase/firestore";
 
 // const { Option } = Select;
 
 // const ShowData = () => {
-//     const [data, setData] = useState([]); // Courier data
-//     const [riders, setRiders] = useState([]); // Riders list
-//     const [selectedRider, setSelectedRider] = useState("All"); // Rider filter
-//     const [selectedDate, setSelectedDate] = useState(null); // Date filter
-//     const [loading, setLoading] = useState(true); // Loading state
-//     const inputRefs = useRef([]); // Refs to handle input focus
+//     const [data, setData] = useState([]);
+//     const [riders, setRiders] = useState([]);
+//     const [filteredData, setFilteredData] = useState([]);
+//     const [selectedRider, setSelectedRider] = useState("All");
+//     const [selectedDate, setSelectedDate] = useState(null);
+//     const [loading, setLoading] = useState(true);
+//     const inputRefs = useRef([]);
 
+//     // Load data on component mount
 //     useEffect(() => {
-//         const fetchData = () => {
-//             setLoading(true);
-//             const savedRiders = localStorage.getItem("couriers");
-//             const savedCouriers = localStorage.getItem("courierData");
+//         setLoading(true);
 
-//             if (savedRiders) {
-//                 setRiders(JSON.parse(savedRiders));
-//             }
-//             if (savedCouriers) {
-//                 setData(JSON.parse(savedCouriers));
-//             }
+//         const fetchData = async () => {
+//             try {
+//                 // Fetch saved deliveries
+//                 const deliveriesQuery = query(collection(fireStore, "deliveries"));
+//                 const deliveriesSnapshot = await getDocs(deliveriesQuery);
+//                 const deliveries = deliveriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+//                 console.log("Deliveries Loaded:", deliveries);
+//                 setData(deliveries);
+//                 setFilteredData(deliveries);
 
-//             setTimeout(() => {
+//                 // Fetch riders data
+//                 const ridersQuery = query(collection(fireStore, "riders"));
+//                 const ridersSnapshot = await getDocs(ridersQuery);
+//                 const ridersList = ridersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+//                 console.log("Riders Loaded:", ridersList);
+//                 setRiders(ridersList);
+
 //                 setLoading(false);
-//             }, 800);
+//             } catch (error) {
+//                 console.error("Error fetching data: ", error);
+//                 message.error("Failed to fetch data from Firestore!");
+//                 setLoading(false);
+//             }
 //         };
 
 //         fetchData();
 //     }, []);
 
-//     const handleRiderChange = (value) => {
-//         setSelectedRider(value);
-//     };
-
-//     const handleDateChange = (date, dateString) => {
-//         setSelectedDate({ date, dateString });
-//     };
-
-//     // Filtered data based on rider and date
-//     const filteredData = data.filter((item) => {
-//         const matchesRider =
-//             selectedRider === "All" || item.riderName === selectedRider;
-//         const matchesDate = selectedDate
-//             ? item.date === selectedDate?.dateString
-//             : true;
-//         return matchesRider && matchesDate;
-//     });
-
-//     // Update the receiver name for a specific row
-//     const updateReceiverName = (key, value) => {
-//         const updatedData = data.map((item) => {
-//             if (item.cnNumber === key) {
-//                 return { ...item, receiverName: value };
-//             }
-//             return item;
-//         });
-//         setData(updatedData);
-//     };
-
-//     // Save all data to local storage
-//     const saveAll = () => {
-//         localStorage.setItem("courierData", JSON.stringify(data));
-//         message.success("All changes saved successfully!");
-//     };
-
-//     const handleKeyPress = (index, key, value) => {
-//         // Update the receiver name on Enter key press
-//         if (key === "Enter") {
-//             updateReceiverName(value.cnNumber, value.receiverName);
-//             // Focus on the next input
-//             const nextInput = inputRefs.current[index + 1];
-//             if (nextInput) {
-//                 nextInput.focus();
-//             }
-//         }
-//     };
-
-//     const columns = [
-//         {
-//             title: "#",
-//             dataIndex: "key",
-//             key: "index",
-//             render: (_, __, index) => index + 1, // Display row index
-//         },
-//         {
-//             title: "Rider Name",
-//             dataIndex: "riderName",
-//             key: "riderName",
-//         },
-//         {
-//             title: "CN Number",
-//             dataIndex: "cnNumber",
-//             key: "cnNumber",
-//         },
-//         {
-//             title: "Receiver Name",
-//             dataIndex: "receiverName",
-//             key: "receiverName",
-//             render: (_, record, index) => (
-//                 <Input
-//                     defaultValue={record.receiverName}
-//                     ref={(ref) => (inputRefs.current[index] = ref)} // Assign refs for inputs
-//                     onChange={(e) =>
-//                         updateReceiverName(record.cnNumber, e.target.value)
-//                     }
-//                     onKeyDown={(e) => handleKeyPress(index, e.key, record)} // Handle Enter key press
-//                 />
-//             ),
-//         },
-//         {
-//             title: "Consignee Number",
-//             dataIndex: "consigneeNumber",
-//             key: "consigneeNumber",
-//         },
-//         {
-//             title: "Date",
-//             dataIndex: "date",
-//             key: "date",
-//         },
-//     ];
-
-//     return (
-//         <main className="d-flex justify-content-center align-items-center">
-//             <Container>
-//                 <Row>
-//                     <Col span={24}>
-//                         <h1 className="mt-5">Show Data</h1>
-//                         <Card>
-//                             <Row className="mb-3">
-//                                 <Col span={12}>
-//                                     <label>Select Rider</label>
-//                                     <Select
-//                                         className="w-100"
-//                                         value={selectedRider}
-//                                         onChange={handleRiderChange}
-//                                     >
-//                                         <Option value="All">All</Option>
-//                                         {riders.map((rider, index) => (
-//                                             <Option key={index} value={rider.name}>
-//                                                 {rider.name}
-//                                             </Option>
-//                                         ))}
-//                                     </Select>
-//                                 </Col>
-//                                 <Col span={12}>
-//                                     <label>Select Date</label>
-//                                     <DatePicker
-//                                         className="w-100"
-//                                         onChange={handleDateChange}
-//                                         value={selectedDate?.date}
-//                                     />
-//                                 </Col>
-//                             </Row>
-//                             <Button
-//                                 type="primary"
-//                                 className="mb-3"
-//                                 onClick={saveAll}
-//                             >
-//                                 Save All
-//                             </Button>
-//                             <Table
-//                                 columns={columns}
-//                                 dataSource={filteredData}
-//                                 rowKey="cnNumber"
-//                                 bordered
-//                                 pagination={false}
-//                                 loading={loading}
-//                             />
-//                         </Card>
-//                     </Col>
-//                 </Row>
-//             </Container>
-//         </main>
-//     );
-// };
-
-// export default ShowData;
-
-
-// import { Table, Card, Select, DatePicker,  Row, Col, Button } from "antd";
-// import React, { useState, useEffect } from "react";
-// import { Container } from "react-bootstrap";
-
-// const { Option } = Select;
-
-// const ShowData = () => {
-//     const [data, setData] = useState([]);
-//     const [riders, setRiders] = useState([]);
-//     const [selectedRider, setSelectedRider] = useState("All");
-//     const [selectedDate, setSelectedDate] = useState(null);
-//     const [loading, setLoading] = useState(true);
-
-//     useEffect(() => {
-//         setLoading(true);
-//         const savedRiders = localStorage.getItem("couriers");
-//         const savedCouriers = localStorage.getItem("courierData");
-
-//         if (savedRiders) setRiders(JSON.parse(savedRiders));
-//         if (savedCouriers) setData(JSON.parse(savedCouriers));
-//         setTimeout(() => {(setLoading(false))}, 800);
-//     }, []);
-
-//     const handleRiderChange = (value) => setSelectedRider(value);
-
-//     const handleDateChange = (date, dateString) =>
-//         setSelectedDate(date ? dateString : null);
-
-//     const filteredData = data.filter((item) => {
-//         const matchesRider =
-//             selectedRider === "All" || item.riderId === selectedRider;
-//         const matchesDate = selectedDate ? item.date === selectedDate : true;
-//         return matchesRider && matchesDate;
-//     });
-
-//     return (
-//         <main className="d-flex justify-content-center align-items-center">
-//             <Container className="m">
-//                 <Row>
-//                     <Col span={24}>
-//                         <h1>Show Data</h1>
-//                         <Card>
-//                             <Select
-//                                 className="w-50 me-2"
-//                                 value={selectedRider}
-//                                 onChange={handleRiderChange}
-//                             >
-//                                 <Option value="All">All</Option>
-//                                 {riders.map((rider) => (
-//                                     <Option key={rider.id} value={rider.id}>
-//                                         {rider.name}
-//                                     </Option>
-//                                 ))}
-//                             </Select>
-//                             <DatePicker
-//                                 onChange={handleDateChange}
-//                                 className="w-50"
-//                             />
-//                               <Button 
-//                                 type="primary"
-//                                 className="mb-3"
-//                                 // onClick={saveAll}
-//                             >
-//                                 Save All
-//                             </Button>
-//                             <Table loading={loading}
-//                                 dataSource={filteredData}
-//                                 rowKey="cnNumber"
-//                                 pagination={false}
-//                                 columns={[
-//                                     {
-//                                         title: "CN Number",
-//                                         dataIndex: "cnNumber",
-//                                         key: "cnNumber",
-//                                     },
-//                                     {
-//                                         title: "Consignee Name",
-//                                         dataIndex: "consigneeName",
-//                                         key: "consigneeName",
-//                                     },
-//                                     {
-//                                         title: "Rider Name",
-//                                         key: "riderName",
-//                                         render: (record) =>
-//                                             riders.find((r) => r.id === record.riderId)?.name || "Unknown",
-//                                     },
-//                                     {
-//                                         title: "Date",
-//                                         dataIndex: "date",
-//                                         key: "date",
-//                                     },
-//                                 ]}
-//                             />
-//                         </Card>
-
-//                     </Col>
-//                 </Row>
-//             </Container>
-//         </main>
-//     );
-// };
-
-// export default ShowData;
-
-// import { Table, Card, Select, DatePicker, Row, Col, Button, Input, message } from "antd";
-// import React, { useState, useEffect, useRef } from "react";
-// import { Container } from "react-bootstrap";
-
-// const { Option } = Select;
-
-// const ShowData = () => {
-//     const [data, setData] = useState([]);
-//     const [riders, setRiders] = useState([]);
-//     const [selectedRider, setSelectedRider] = useState("All");
-//     const [selectedDate, setSelectedDate] = useState(null);
-//     const [loading, setLoading] = useState(true);
-
-//     const inputRefs = useRef([]);
-
-//     useEffect(() => {
-//         setLoading(true);
-//         const savedRiders = localStorage.getItem("couriers");
-//         const savedCouriers = localStorage.getItem("courierData");
-
-//         if (savedRiders) setRiders(JSON.parse(savedRiders));
-//         if (savedCouriers) setData(JSON.parse(savedCouriers));
-//         setTimeout(() => setLoading(false), 800);
-//     }, []);
-
-//     const handleRiderChange = (value) => setSelectedRider(value);
-
-//     const handleDateChange = (date, dateString) =>
-//         setSelectedDate(date ? dateString : null);
-
-//     const updateReceiverName = (cnNumber, value) => {
-//         setData((prevData) =>
-//             prevData.map((item) =>
-//                 item.cnNumber === cnNumber
-//                     ? { ...item, receiverName: value }
-//                     : item
-//             )
-//         );
-//     };
-
-//     const handleKeyPress = (index, key, record) => {
-//         if (key === "Enter") {
-//             const nextInput = inputRefs.current[index + 1];
-//             if (nextInput) {
-//                 nextInput.focus(); // Move focus to the next input
-//             } else {
-//                 message.success(
-//                     `Receiver name updated for CN Number: ${record.cnNumber}`
-//                 );
-//             }
-//         }
-//     };
-
-//     const filteredData = data.filter((item) => {
-//         const matchesRider =
-//             selectedRider === "All" || item.riderId === selectedRider;
-//         const matchesDate = selectedDate ? item.date === selectedDate : true;
-//         return matchesRider && matchesDate;
-//     });
-
-//     return (
-//         <main className="d-flex justify-content-center align-items-center">
-//             <Container className="m">
-//                 <Row>
-//                     <Col span={24}>
-//                         <h1>Show Data</h1>
-//                         <Card>
-//                             <Select
-//                                 className="w-50 me-2"
-//                                 value={selectedRider}
-//                                 onChange={handleRiderChange}
-//                             >
-//                                 <Option value="All">All</Option>
-//                                 {riders.map((rider) => (
-//                                     <Option key={rider.id} value={rider.id}>
-//                                         {rider.name}
-//                                     </Option>
-//                                 ))}
-//                             </Select>
-//                             <DatePicker
-//                                 onChange={handleDateChange}
-//                                 className="w-50"
-//                             />
-//                             <Button 
-//                                 type="primary"
-//                                 className="mb-3"
-//                                 onClick={() => message.success("All data saved!")}
-//                             >
-//                                 Save All
-//                             </Button>
-//                             <Table
-//                                 loading={loading}
-//                                 dataSource={filteredData}
-//                                 rowKey="cnNumber"
-//                                 pagination={false}
-//                                 columns={[
-//                                     {
-//                                         title: "CN Number",
-//                                         dataIndex: "cnNumber",
-//                                         key: "cnNumber",
-//                                     },
-//                                     {
-//                                         title: "Consignee Name",
-//                                         dataIndex: "consigneeName",
-//                                         key: "consigneeName",
-//                                     },
-//                                     {
-//                                         title: "Receiver Name",
-//                                         key: "receiverName",
-//                                         render: (record, _, index) => (
-//                                             <Input
-//                                                 defaultValue={record.receiverName}
-//                                                 ref={(ref) => (inputRefs.current[index] = ref)} // Assign refs for inputs
-//                                                 onChange={(e) =>
-//                                                     updateReceiverName(
-//                                                         record.cnNumber,
-//                                                         e.target.value
-//                                                     )
-//                                                 }
-//                                                 onKeyDown={(e) =>
-//                                                     handleKeyPress(
-//                                                         index,
-//                                                         e.key,
-//                                                         record
-//                                                     )
-//                                                 } // Handle Enter key press
-//                                             />
-//                                         ),
-//                                     },
-//                                     {
-//                                         title: "Rider Name",
-//                                         key: "riderName",
-//                                         render: (record) =>
-//                                             riders.find((r) => r.id === record.riderId)?.name ||
-//                                             "Unknown",
-//                                     },
-//                                     {
-//                                         title: "Date",
-//                                         dataIndex: "date",
-//                                         key: "date",
-//                                     },
-//                                 ]}
-//                             />
-//                         </Card>
-//                     </Col>
-//                 </Row>
-//             </Container>
-//         </main>
-//     );
-// };
-
-// export default ShowData;
-
-
-// import { Table, Card, Select, DatePicker, Row, Col, Button, Input, message } from "antd";
-// import React, { useState, useEffect, useRef } from "react";
-// import { Container } from "react-bootstrap";
-
-// const { Option } = Select;
-
-// const ShowData = () => {
-//     const [data, setData] = useState([]);
-//     // const [riders, setRiders] = useState([]);
-//     const [riders, setRiders] = useState(JSON.parse(localStorage.getItem('riders')) || []);
-//     const [deliveries, setDeliveries] = useState(JSON.parse(localStorage.getItem('deliveries')) || []);
-//     const [delivery, setDelivery] = useState({ riderIndex: '', date: '', cnNumber: '', consigneeName: '' });
-//     const [selectedRider, setSelectedRider] = useState("All");
-//     const [selectedDate, setSelectedDate] = useState(null);
-//     const [loading, setLoading] = useState(true);
-
-//     const inputRefs = useRef([]);
-//     useEffect(() => {
-//         setLoading(true);
-    
-//         // Load deliveries, riders, or couriers from localStorage
-//         const savedRiders = localStorage.getItem('riders');
-//         const savedDeliveries = localStorage.getItem('deliveries');
-    
-//         if (savedRiders) setRiders(JSON.parse(savedRiders)); // Initialize riders
-//         if (savedDeliveries) setData(JSON.parse(savedDeliveries)); // Initialize deliveries
-    
-//         setTimeout(() => setLoading(false), 800); // Simulate a delay to show loading state
-//     }, []);
-    
-//     const handleDeliveryChange = (e, name = null) => {
-//         if (name) {
-//             // For Select component (e.g., Rider dropdown)
-//             setDelivery(prev => ({ ...prev, [name]: e }));
-//         } else {
-//             const { name, value } = e.target; // For Input components
-//             setDelivery(prev => ({ ...prev, [name]: value }));
-//         }
-//     };
-    
-
-//     const handleRiderChange = (value) => setSelectedRider(value);
-
-//     const handleDateChange = (date, dateString) =>
-//         setSelectedDate(date ? dateString : null);
-
-//     const updateReceiverName = (cnNumber, value) => {
-//         setData((prevData) =>
-//             prevData.map((item) =>
-//                 item.cnNumber === cnNumber
-//                     ? { ...item, receiverName: value }
-//                     : item
-//             )
-//         );
-//     };
-
-//     const handleSave = () => {
-//         const filteredData = data.filter((item) => {
-//             const matchesRider =
-//                 selectedRider === "All" || item.riderId === selectedRider;
-//             const matchesDate = selectedDate ? item.date === selectedDate : true;
+//     // Filter data by rider and date
+//     const filterData = (rider, date) => {
+//         const filtered = data.filter((item) => {
+//             const matchesRider = rider === "All" || item.riderId === rider;
+//             const matchesDate = date ? item.date === date : true;
 //             return matchesRider && matchesDate;
 //         });
-//         localStorage.setItem("riderData", JSON.stringify(filteredData));
-//         message.success("Data saved successfully!");
+//         setFilteredData(filtered);
+//     };
+
+//     // Handle rider selection change
+//     const handleRiderChange = (value) => {
+//         setSelectedRider(value);
+//         filterData(value, selectedDate);
+//     };
+
+//     // Handle date selection change
+//     const handleDateChange = (date, dateString) => {
+//         setSelectedDate(dateString);
+//         filterData(selectedRider, dateString);
+//     };
+
+//     // Update receiver name in data
+//     const updateReceiverName = (cnNumber, value) => {
+//         setData((prevData) =>
+//             prevData.map((item) =>
+//                 item.cnNumber === cnNumber ? { ...item, receiverName: value } : item
+//             )
+//         );
+//     };
+
+//     // Save filtered data to Firestore
+//     const handleSave = async () => {
+//         try {
+//             const batch = fireStore.batch();
+//             filteredData.forEach((item) => {
+//                 const docRef = fireStore.collection("filteredDeliveries").doc(item.id);
+//                 batch.set(docRef, item);
+//             });
+//             await batch.commit();
+//             message.success("Filtered data saved successfully!");
+//         } catch (error) {
+//             console.error("Error saving filtered data: ", error);
+//             message.error("Failed to save filtered data!");
+//         }
 //     };
 
 //     return (
@@ -514,27 +101,17 @@
 //                     <Col span={24}>
 //                         <h1>Show Data</h1>
 //                         <Card>
-//                             {/* <Select
-//                                 className="w-50 me-2"
+//                             <Select
+//                                 name="riderName"
+//                                 className="my-2 w-100"
 //                                 value={selectedRider}
 //                                 onChange={handleRiderChange}
 //                             >
-//                                 <Option value="All">All</Option>
+//                                 <Option value="All">All Riders</Option>
 //                                 {riders.map((rider) => (
 //                                     <Option key={rider.id} value={rider.id}>
 //                                         {rider.name}
 //                                     </Option>
-//                                 ))}
-//                             </Select> */}
-//                             <Select
-//                                 name="riderIndex"
-//                                 className="my-2 w-100"
-//                                 value={delivery.riderIndex}
-//                                 onChange={(value) => handleDeliveryChange(value, "riderIndex")}
-//                             >
-//                                 <option value="" disabled>Select a rider</option>
-//                                 {riders.map((rider, index) => (
-//                                     <option key={index} value={index}>{rider.name}</option>
 //                                 ))}
 //                             </Select>
 //                             <DatePicker
@@ -546,14 +123,24 @@
 //                                 className="mb-3"
 //                                 onClick={handleSave}
 //                             >
-//                                 Save All
+//                                 Save Filtered Data
 //                             </Button>
 //                             <Table
 //                                 loading={loading}
-//                                 dataSource={data}
-//                                 rowKey="cnNumber"
+//                                 dataSource={filteredData}
+//                                 rowKey={(record) => record.id} // Ensure unique rowKey
 //                                 pagination={false}
 //                                 columns={[
+//                                     {
+//                                         title: "Rider Name",
+//                                         key: "riderName",
+//                                         render: (record) => {
+//                                             const rider = riders.find(
+//                                                 (r) => r.id === record.riderId
+//                                             );
+//                                             return rider?.name || "Unknown";
+//                                         },
+//                                     },
 //                                     {
 //                                         title: "CN Number",
 //                                         dataIndex: "cnNumber",
@@ -571,8 +158,7 @@
 //                                             <Input
 //                                                 defaultValue={record.receiverName}
 //                                                 ref={(ref) =>
-//                                                 (inputRefs.current[index] =
-//                                                     ref)
+//                                                     (inputRefs.current[index] = ref)
 //                                                 }
 //                                                 onChange={(e) =>
 //                                                     updateReceiverName(
@@ -584,12 +170,421 @@
 //                                         ),
 //                                     },
 //                                     {
+//                                         title: "Date",
+//                                         dataIndex: "date",
+//                                         key: "date",
+//                                     },
+//                                 ]}
+//                             />
+//                         </Card>
+//                     </Col>
+//                 </Row>
+//             </Container>
+//         </main>
+//     );
+// };
+
+// export default ShowData;
+
+// import { Table, Card, Select, DatePicker, Row, Col, Button, Input, message } from "antd";
+// import React, { useState, useEffect, useRef } from "react";
+// import { Container } from "react-bootstrap";
+// import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
+// import { collection, getDocs, query, writeBatch } from "firebase/firestore";
+
+// const { Option } = Select;
+
+// const ShowData = () => {
+//     const [data, setData] = useState([]);
+//     const [riders, setRiders] = useState([]);
+//     const [filteredData, setFilteredData] = useState([]);
+//     const [selectedRider, setSelectedRider] = useState("All");
+//     const [selectedDate, setSelectedDate] = useState(null);
+//     const [loading, setLoading] = useState(true);
+//     const inputRefs = useRef([]);
+
+//     // Load data on component mount
+//     useEffect(() => {
+//         setLoading(true);
+
+//         const fetchData = async () => {
+//             try {
+//                 // Fetch saved deliveries
+//                 const deliveriesQuery = query(collection(fireStore, "deliveries"));
+//                 const deliveriesSnapshot = await getDocs(deliveriesQuery);
+//                 const deliveries = deliveriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+//                 console.log("Deliveries Loaded:", deliveries);
+//                 setData(deliveries);
+//                 setFilteredData(deliveries);
+//                 // Fetch riders data
+//                 const ridersQuery = query(collection(fireStore, "riders"));
+//                 const ridersSnapshot = await getDocs(ridersQuery);
+//                 const ridersList = ridersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+//                 console.log("Riders Loaded:", ridersList);
+//                 setRiders(ridersList);
+//                 setLoading(false);
+//             } catch (error) {
+//                 console.error("Error fetching data: ", error);
+//                 message.error("Failed to fetch data from Firestore!");
+//                 setLoading(false);
+//             }
+//         };
+
+//         fetchData();
+//     }, []);
+
+//     // Filter data by rider and date
+//     const filterData = (rider, date) => {
+//         const filtered = data.filter((item) => {
+//             const matchesRider = rider === "All" || item.riderId === rider;
+//             const matchesDate = date ? item.date === date : true;
+//             return matchesRider && matchesDate;
+//         });
+//         setFilteredData(filtered);
+//     };
+
+//     // Handle rider selection change
+//     const handleRiderChange = (value) => {
+//         setSelectedRider(value);
+//         filterData(value, selectedDate);
+//     };
+
+//     // Handle date selection change
+//     const handleDateChange = (date, dateString) => {
+//         setSelectedDate(dateString);
+//         filterData(selectedRider, dateString);
+//     };
+
+//     // Update receiver name in data
+//     const updateReceiverName = (cnNumber, value) => {
+//         setData((prevData) =>
+//             prevData.map((item) =>
+//                 item.cnNumber === cnNumber ? { ...item, receiverName: value } : item
+//             )
+//         );
+//     };
+
+//     // Handle key press to focus on the next input field
+//     const handleKeyPress = (e, index) => {
+//         if (e.key === "Enter" && inputRefs.current[index + 1]) {
+//             inputRefs.current[index + 1].focus();
+//         }
+//     };
+
+//     // Save filtered data to Firestore
+//     const handleSave = async () => {
+//         try {
+//             const batch = writeBatch(fireStore);
+//             filteredData.forEach((item) => {
+//                 const docRef = collection(fireStore, "deliveries").doc(item.id);
+//                 batch.update(docRef, { receiverName: item.receiverName });
+//             });
+//             await batch.commit();
+//             message.success("Receiver names saved successfully!");
+//         } catch (error) {
+//             console.error("Error saving receiver names: ", error);
+//             message.error("Failed to save receiver names!");
+//         }
+//     };
+
+//     return (
+//         <main className="d-flex justify-content-center align-items-center">
+//             <Container className="m">
+//                 <Row>
+//                     <Col span={24}>
+//                         <h1>Show Data</h1>
+//                         <Card>
+//                             <Select
+//                                 name="riderName"
+//                                 className="my-2 w-100"
+//                                 value={selectedRider}
+//                                 onChange={handleRiderChange}
+//                             >
+//                                 <Option value="All">All Riders</Option>
+//                                 {riders.map((rider) => (
+//                                     <Option key={rider.id} value={rider.id}>
+//                                         {rider.name}
+//                                     </Option>
+//                                 ))}
+//                             </Select>
+//                             <DatePicker
+//                                 onChange={handleDateChange}
+//                                 className="w-50"
+//                             />
+//                             <Button
+//                                 type="primary"
+//                                 className="mb-3"
+//                                 onClick={handleSave}
+//                             >
+//                                 Save Receiver Names
+//                             </Button>
+//                             <Table
+//                                 loading={loading}
+//                                 dataSource={filteredData}
+//                                 rowKey={(record) => record.id} // Ensure unique rowKey
+//                                 pagination={false}
+//                                 columns={[
+//                                     {
 //                                         title: "Rider Name",
 //                                         key: "riderName",
-//                                         render: (record) =>
-//                                             riders.find(
+//                                         render: (record) => {
+//                                             const rider = riders.find(
 //                                                 (r) => r.id === record.riderId
-//                                             )?.name || "Unknown",
+//                                             );
+//                                             return rider?.name || "Unknown";
+//                                         },
+//                                     },
+//                                     {
+//                                         title: "CN Number",
+//                                         dataIndex: "cnNumber",
+//                                         key: "cnNumber",
+//                                     },
+//                                     {
+//                                         title: "Consignee Name",
+//                                         dataIndex: "consigneeName",
+//                                         key: "consigneeName",
+//                                     },
+//                                     {
+//                                         title: "Receiver Name",
+//                                         key: "receiverName",
+//                                         render: (record, _, index) => (
+//                                             <Input
+//                                                 defaultValue={record.receiverName}
+//                                                 ref={(ref) =>
+//                                                     (inputRefs.current[index] = ref)
+//                                                 }
+//                                                 onChange={(e) =>
+//                                                     updateReceiverName(
+//                                                         record.cnNumber,
+//                                                         e.target.value
+//                                                     )
+//                                                 }
+//                                                 onKeyDown={(e) => handleKeyPress(e, index)}
+//                                             />
+//                                         ),
+//                                     },
+//                                     {
+//                                         title: "Date",
+//                                         dataIndex: "date",
+//                                         key: "date",
+//                                     },
+//                                 ]}
+//                             />
+//                         </Card>
+//                     </Col>
+//                 </Row>
+//             </Container>
+//         </main>
+//     );
+// };
+
+// export default ShowData;
+
+
+// import { Table, Card, Select, DatePicker, Row, Col, Button, Input, message } from "antd";
+// import React, { useState, useEffect, useRef } from "react";
+// import { Container } from "react-bootstrap";
+// import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
+// import { collection, getDocs, query, writeBatch, doc, addDoc } from "firebase/firestore";
+// import { set } from "lodash";
+
+// const { Option } = Select;
+
+// const ShowData = () => {
+//     const [data, setData] = useState([]);
+//     const [riders, setRiders] = useState([]);
+//     const [filteredData, setFilteredData] = useState([]);
+//     const [selectedRider, setSelectedRider] = useState("All");
+//     const [selectedDate, setSelectedDate] = useState(null);
+//     const [newReciver , setNewReciver] = useState({reciverName : ""});
+//     const [loading, setLoading] = useState(true);
+//     const inputRefs = useRef([]);
+
+//     // Load data on component mount
+//     useEffect(() => {
+//         setLoading(true);
+
+//         const fetchData = async () => {
+//             try {
+//                 // Fetch saved deliveries
+//                 const deliveriesQuery = query(collection(fireStore, "deliveries"));
+//                 const deliveriesSnapshot = await getDocs(deliveriesQuery);
+//                 const deliveries = deliveriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+//                 console.log("Deliveries Loaded:", deliveries);
+//                 setData(deliveries);
+//                 setFilteredData(deliveries);
+//                 // setNewReciver(deliveries);
+//                 // Fetch riders data
+//                 const ridersQuery = query(collection(fireStore, "riders"));
+//                 const ridersSnapshot = await getDocs(ridersQuery);
+//                 const ridersList = ridersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+//                 console.log("Riders Loaded:", ridersList);
+//                 setRiders(ridersList);
+//                 setNewReciver(ridersList);
+//                 setLoading(false);
+//             } catch (error) {
+//                 console.error("Error fetching data: ", error);
+//                 message.error("Failed to fetch data from Firestore!");
+//                 setLoading(false);
+//             }
+//         };
+
+//         fetchData();
+//     }, []);
+
+//     const handleReciverChange = (e) => {
+//         const { name, value } = e.target;
+//         setNewReciver((prev) => ({ ...prev, [name]: value }));
+//     };
+//      const handleSaveReciver = async () => {
+//             if (!newReciver.reciverName) {
+//                 message.error("Please fill all fields!");
+//                 return;
+//             }
+    
+//             // // Check if a rider with the same name already exists
+//             // const duplicate = riders.find((rider) => rider.name.toLowerCase() === newRider.name.toLowerCase());
+//             // if (duplicate) {
+//             //     message.error("Rider with this name already exists!");
+//             //     return;
+//             // }
+    
+//             try {
+//                 const docRef = await addDoc(collection(fireStore, "riders"), newReciver);
+//                 setRiders((prevRiders) => [...prevRiders, { id: docRef.id, ...newReciver }]);
+//                 setNewReciver({ reciverName: "" });
+//                 message.success("Reciver added successfully!");
+//             } catch (e) {
+//                 console.error("Error adding document: ", e);
+//                 message.error("Error adding reciver!");
+//             }
+//         };
+
+
+//     // Filter data by rider and date
+//     const filterData = (rider, date) => {
+//         const filtered = data.filter((item) => {
+//             const matchesRider = rider === "All" || item.riderId === rider;
+//             const matchesDate = date ? item.date === date : true;
+//             return matchesRider && matchesDate;
+//         });
+//         setFilteredData(filtered);
+//     };
+
+//     // Handle rider selection change
+//     const handleRiderChange = (value) => {
+//         setSelectedRider(value);
+//         filterData(value, selectedDate);
+//     };
+
+//     // Handle date selection change
+//     const handleDateChange = (date, dateString) => {
+//         setSelectedDate(dateString);
+//         filterData(selectedRider, dateString);
+//     };
+
+//     // Update receiver name in data
+//     const updateReceiverName = (cnNumber, value) => {
+//         setData((prevData) =>
+//             prevData.map((item) =>
+//                 item.cnNumber === cnNumber ? { ...item, receiverName: value } : item
+//             )
+//         );
+//     };
+
+//     // Handle key press to focus on the next input field
+//     const handleKeyPress = (e, index) => {
+//         if (e.key === "Enter" && inputRefs.current[index + 1]) {
+//             inputRefs.current[index + 1].focus();
+//         }
+//     };
+
+//     // Save filtered data to Firestore
+//     const handleSave = async () => {
+//         try {
+//             const batch = writeBatch(fireStore);
+//             filteredData.forEach((item) => {
+//                 const docRef = doc(fireStore, "deliveries", item.id);
+//                 batch.update(docRef, { receiverName: item.receiverName });
+//             });
+//             await batch.commit();
+//             message.success("Receiver names saved successfully!");
+//         } catch (error) {
+//             console.error("Error saving receiver names: ", error);
+//             message.error("Failed to save receiver names!");
+//         }
+//     };
+
+//     return (
+//         <main className="d-flex justify-content-center align-items-center">
+//             <Container className="m">
+//                 <Row>
+//                     <Col span={24}>
+//                         <h1>Show Data</h1>
+//                         <Card>
+//                             <Select
+//                                 name="riderName"
+//                                 className="my-2 w-100"
+//                                 value={selectedRider}
+//                                 onChange={handleRiderChange}
+//                             >
+//                                 <Option value="All">All Riders</Option>
+//                                 {riders.map((rider) => (
+//                                     <Option key={rider.id} value={rider.id}>
+//                                         {rider.name}
+//                                     </Option>
+//                                 ))}
+//                             </Select>
+//                             <DatePicker
+//                                 onChange={handleDateChange}
+//                                 className="w-50"
+//                             />
+//                             <Button
+//                                 type="primary"
+//                                 className="mb-3"
+//                                 onClick={handleSaveReciver}
+//                             >
+//                                 Save Receiver Names
+//                             </Button>
+//                             <Table
+//                                 loading={loading}
+//                                 dataSource={filteredData}
+//                                 rowKey={(record) => record.id} // Ensure unique rowKey
+//                                 pagination={false}
+//                                 columns={[
+//                                     {
+//                                         title: "Rider Name",
+//                                         key: "riderName",
+//                                         render: (record) => {
+//                                             const rider = riders.find(
+//                                                 (r) => r.id === record.riderId
+//                                             );
+//                                             return rider?.name || "Unknown";
+//                                         },
+//                                     },
+//                                     {
+//                                         title: "CN Number",
+//                                         dataIndex: "cnNumber",
+//                                         key: "cnNumber",
+//                                     },
+//                                     {
+//                                         title: "Consignee Name",
+//                                         dataIndex: "consigneeName",
+//                                         key: "consigneeName",
+//                                     },
+//                                     {
+//                                         title: "Receiver Name",
+//                                         key: "receiverName",
+//                                         render: (record, _, index) => (
+//                                             <Input onChange={handleReciverChange}
+//                                                 defaultValue={record.receiverName}
+//                                                 ref={(ref) =>
+//                                                     (inputRefs.current[index] = ref)
+//                                                 }
+                                                
+//                                                 onKeyDown={(e) => handleKeyPress(e, index)}
+//                                             />
+//                                         ),
 //                                     },
 //                                     {
 //                                         title: "Date",
@@ -611,64 +606,104 @@
 import { Table, Card, Select, DatePicker, Row, Col, Button, Input, message } from "antd";
 import React, { useState, useEffect, useRef } from "react";
 import { Container } from "react-bootstrap";
+import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
+import { collection, getDocs, query, writeBatch, doc } from "firebase/firestore";
 
 const { Option } = Select;
 
 const ShowData = () => {
     const [data, setData] = useState([]);
-    const [riders, setRiders] = useState(JSON.parse(localStorage.getItem("riders")) || []);
-    const [deliveries, setDeliveries] = useState(JSON.parse(localStorage.getItem("deliveries")) || []);
-    const [delivery, setDelivery] = useState({ ridername: "", date: "", cnNumber: "", consigneeName: "" });
+    const [riders, setRiders] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [selectedRider, setSelectedRider] = useState("All");
     const [selectedDate, setSelectedDate] = useState(null);
     const [loading, setLoading] = useState(true);
     const inputRefs = useRef([]);
+    const [newReceiver, setNewReceiver] = useState({});
 
+    // Load data on component mount
     useEffect(() => {
         setLoading(true);
 
-        const savedRiders = localStorage.getItem("riders");
-        const savedDeliveries = localStorage.getItem("deliveries");
+        const fetchData = async () => {
+            try {
+                // Fetch saved deliveries
+                const deliveriesQuery = query(collection(fireStore, "deliveries"));
+                const deliveriesSnapshot = await getDocs(deliveriesQuery);
+                const deliveries = deliveriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("Deliveries Loaded:", deliveries);
+                setData(deliveries);
+                setFilteredData(deliveries);
 
-        if (savedRiders) setRiders(JSON.parse(savedRiders));
-        if (savedDeliveries) setData(JSON.parse(savedDeliveries));
+                // Fetch riders data
+                const ridersQuery = query(collection(fireStore, "riders"));
+                const ridersSnapshot = await getDocs(ridersQuery);
+                const ridersList = ridersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("Riders Loaded:", ridersList);
+                setRiders(ridersList);
 
-        setTimeout(() => setLoading(false), 800);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+                message.error("Failed to fetch data from Firestore!");
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, []);
 
-    const handleDeliveryChange = (e, name = null) => {
-        if (name) {
-            setDelivery((prev) => ({ ...prev, [name]: e }));
-        } else {
-            const { name, value } = e.target;
-            setDelivery((prev) => ({ ...prev, [name]: value }));
+    // Filter data by rider and date
+    const filterData = (rider, date) => {
+        const filtered = data.filter((item) => {
+            const matchesRider = rider === "All" || item.riderId === rider;
+            const matchesDate = date ? item.date === date : true;
+            return matchesRider && matchesDate;
+        });
+        setFilteredData(filtered);
+    };
+
+    // Handle rider selection change
+    const handleRiderChange = (value) => {
+        setSelectedRider(value);
+        filterData(value, selectedDate);
+    };
+
+    // Handle date selection change
+    const handleDateChange = (date, dateString) => {
+        setSelectedDate(dateString);
+        filterData(selectedRider, dateString);
+    };
+
+    // Update receiver name in data
+    const handleReciverChange = (e, cnNumber) => {
+        const { value } = e.target;
+        setNewReceiver((prev) => ({ ...prev, [cnNumber]: value }));
+    };
+
+    // Handle key press to focus on the next input field
+    const handleKeyPress = (e, index) => {
+        if (e.key === "Enter" && inputRefs.current[index + 1]) {
+            inputRefs.current[index + 1].focus();
         }
     };
 
-    const handleRiderChange = (value) => setSelectedRider(value);
-
-    const handleDateChange = (date, dateString) =>
-        setSelectedDate(date ? dateString : null);
-
-    const updateReceiverName = (cnNumber, value) => {
-        setData((prevData) =>
-            prevData.map((item) =>
-                item.cnNumber === cnNumber
-                    ? { ...item, receiverName: value }
-                    : item
-            )
-        );
-    };
-
-    const handleSave = () => {
-        const filteredData = data.filter((item) => {
-            const matchesRider =
-                selectedRider === "All" || item.riderId === selectedRider;
-            const matchesDate = selectedDate ? item.date === selectedDate : true;
-            return matchesRider && matchesDate;
-        });
-        localStorage.setItem("riderData", JSON.stringify(filteredData));
-        message.success("Data saved successfully!");
+    // Save filtered data to Firestore
+    const handleSaveReciver = async () => {
+        try {
+            const batch = writeBatch(fireStore);
+            filteredData.forEach((item) => {
+                if (newReceiver[item.cnNumber]) {
+                    const docRef = doc(fireStore, "deliveries", item.id);
+                    batch.update(docRef, { receiverName: newReceiver[item.cnNumber] });
+                }
+            });
+            await batch.commit();
+            message.success("Receiver names saved successfully!");
+        } catch (error) {
+            console.error("Error saving receiver names: ", error);
+            message.error("Failed to save receiver names!");
+        }
     };
 
     return (
@@ -679,12 +714,12 @@ const ShowData = () => {
                         <h1>Show Data</h1>
                         <Card>
                             <Select
-                                name="riderId"
+                                name="riderName"
                                 className="my-2 w-100"
-                                value={delivery.riderId}
-                                onChange={(value) => handleDeliveryChange(value, "riderId")}
+                                value={selectedRider}
+                                onChange={handleRiderChange}
                             >
-                                <Option value="">Select a rider</Option>
+                                <Option value="All">All Riders</Option>
                                 {riders.map((rider) => (
                                     <Option key={rider.id} value={rider.id}>
                                         {rider.name}
@@ -698,27 +733,30 @@ const ShowData = () => {
                             <Button
                                 type="primary"
                                 className="mb-3"
-                                onClick={handleSave}
+                                onClick={handleSaveReciver}
                             >
-                                Save All
+                                Save Receiver Names
                             </Button>
                             <Table
                                 loading={loading}
-                                dataSource={data}
-                                rowKey="cnNumber"
+                                dataSource={filteredData}
+                                rowKey={(record) => record.id} // Ensure unique rowKey
                                 pagination={false}
                                 columns={[
                                     {
                                         title: "Rider Name",
                                         key: "riderName",
-                                        render: (record) =>
-                                            riders.find((r) => r.id === record.ridername)?.name || "Unknown",
+                                        render: (record) => {
+                                            const rider = riders.find(
+                                                (r) => r.id === record.riderId
+                                            );
+                                            return rider?.name || "Unknown";
+                                        },
                                     },
                                     {
                                         title: "CN Number",
                                         dataIndex: "cnNumber",
                                         key: "cnNumber",
-                                        type: "number",
                                     },
                                     {
                                         title: "Consignee Name",
@@ -735,11 +773,9 @@ const ShowData = () => {
                                                     (inputRefs.current[index] = ref)
                                                 }
                                                 onChange={(e) =>
-                                                    updateReceiverName(
-                                                        record.cnNumber,
-                                                        e.target.value
-                                                    )
+                                                    handleReciverChange(e, record.cnNumber)
                                                 }
+                                                onKeyDown={(e) => handleKeyPress(e, index)}
                                             />
                                         ),
                                     },
@@ -759,23 +795,3 @@ const ShowData = () => {
 };
 
 export default ShowData;
-
-
-// const columns = [
-//     {
-//         title: "#",
-//         dataIndex: "key",
-//         key: "index",
-//         render: (_, __, index) => index + 1,
-//     filters: data.map((item) => ({
-//         text: item.riderName,
-//         value: item.riderName,
-//     })),
-//     onFilter: (value, record) => record.riderName.includes(value),
-//     },
-//     { title: "Rider Name", dataIndex: "riderName", key: "riderName" },
-//     { title: "Receiver Name", dataIndex: "receiverName", key: "receiverName" },
-//     { title: "CN Number", dataIndex: "cnNumber", key: "cnNumber" },
-//     { title: "Consignee Number", dataIndex: "consigneeNumber", key: "consigneeNumber" },
-//     { title: "Date", dataIndex: "date", key: "date" },
-// ];
