@@ -13,28 +13,6 @@ const Register = () => {
     const [state, setState] = useState(initialState);
     const [isProcessing, setIsProcessing] = useState(false);
     const handleChange = e => setState({ ...state, [e.target.name]: e.target.value });
-    // const handleSubmit = e => {
-    //     e.preventDefault();
-    //     let { fullName, email, password, confirmPassword } = state;
-    //     fullName = fullName.trim();
-    //     if (fullName.length < 3) { return message.error("Please Enter Your Name Correctly"); }
-    //     if (password.length < 8) { return message.error("Password must be at least 8 characters."); }
-    //     if (confirmPassword !== password) { return message.error("Passwords do not match."); }
-    //     const userData = { uid: "", fullName, email, password, confirmPassword };
-    //     setIsProcessing(true);
-    //     createUserWithEmailAndPassword(auth, email, password)
-    //         .then((userCredential) => {
-    //             const user = userCredential.user;
-    //             message.success("User registered successfully!");
-    //             createDocument({ ...userData, uid: user.uid });
-    //             navigate("/add");
-    //         })
-    //         .catch((error) => {
-    //             message.error("Account is already registered");
-    //         }).finally(() => {
-    //             setIsProcessing(false);
-    //         });
-    // };
     const handleSubmit = e => {
         e.preventDefault();
         let { fullName, email, password, confirmPassword } = state;
@@ -42,14 +20,11 @@ const Register = () => {
         if (fullName.length < 3) return message.error("Please Enter Your Name Correctly");
         if (password.length < 8) return message.error("Password must be at least 8 characters.");
         if (confirmPassword !== password) return message.error("Passwords do not match.");
-
         setIsProcessing(true);
-
         createUserWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 const user = userCredential.user;
                 const userData = { uid: user.uid, fullName, email };
-
                 await setDoc(doc(fireStore, "users", user.uid), userData);
                 createDocument({ ...userData, uid: user.uid });
                 message.success("User registered successfully!");

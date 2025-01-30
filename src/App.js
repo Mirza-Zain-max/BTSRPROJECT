@@ -1,5 +1,6 @@
 import React from 'react'
 import './App.scss';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Route from './Pages/Routes/Route'
 import { useLocation } from 'react-router-dom';
 import Header1 from './Components/Header/Header';
