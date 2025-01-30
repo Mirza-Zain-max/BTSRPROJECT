@@ -60,7 +60,7 @@ const ViewSheet = () => {
       format: 'a4',
     });
     const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
+    // const pageHeight = doc.internal.pageSize.getHeight();
     const title = "Delivery Sheet";
     const titleWidth = doc.getTextWidth(title);
     doc.text(title, (pageWidth - titleWidth) / 2, 20);
@@ -100,7 +100,7 @@ const ViewSheet = () => {
       ]);
     }
     doc.autoTable({
-      head: [["Index", "CN Number / Consignee Name / Rider Name", "Receiver Name / Stamp", "", "Index", "CN Number / Consignee Name / Rider Name", "Receiver Name / Stamp"]],
+      head: [["Index", "CN Number / Consignee Name ", "Receiver Name / Stamp", "", "Index", "CN Number / Consignee Name", "Receiver Name / Stamp"]],
       body: bodyData,
       startY: 50,
       styles: {
@@ -111,7 +111,7 @@ const ViewSheet = () => {
       tableWidth: 'auto',
       margin: { top: 50, bottom: 20 },
     });
-    const fileName = `${deliverySheetData[0]?.date}_${deliverySheetData[0]?.consigneeName}.pdf`;
+    const fileName = `${deliverySheetData[0]?.date}_${deliverySheetData[0]?.riderName}.pdf`;
     doc.save(fileName);
   };
   const columns = [

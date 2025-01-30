@@ -19,6 +19,7 @@ const Login = () => {
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
+                
                 localStorage.setItem('user-login', true)
                 localStorage.setItem('user-uid', user.uid)
                 message.success("User is Successfully  Login ")
@@ -30,7 +31,7 @@ const Login = () => {
             .finally(() => {
                 setTimeout(()=>{
                     setIsProcessing(false)
-                },2000)
+                },1000)
             })
     }
 

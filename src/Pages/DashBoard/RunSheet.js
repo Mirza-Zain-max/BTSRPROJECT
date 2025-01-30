@@ -259,10 +259,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { Container } from "react-bootstrap";
 import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
 import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import { useAuthContext } from "../../Context/Auth";
 
 const { Option } = Select;
 
 const RunSheet = () => {
+    const { user} = useAuthContext();
     const { Title } = Typography;
     const [riders, setRiders] = useState([]);
     const [deliveries, setDeliveries] = useState([]);
@@ -272,7 +274,7 @@ const RunSheet = () => {
         console.log('deliveries', deliveries)
     useEffect(() => {
         const fetchRiders = async () => {
-            const q = query(collection(fireStore, "riders"));
+            const q = query(collection(fireStore, "riders"), where ("Created_By.Uid" , "==" , user.uid ));
             const querySnapshot = await getDocs(q);
             const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setRiders(ridersList);

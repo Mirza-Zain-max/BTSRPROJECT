@@ -106,7 +106,7 @@ const AuthProvider = ({ children }) => {
             const docSnap = await getDoc(doc(fireStore, "users", user.uid));
             if (docSnap.exists()) {
                 const userData = docSnap.data();
-                console.log('Firestore user:', userData);
+                // console.log('Firestore user:', userData);
                 dispatch(prevState => ({ ...prevState, isAuth: true, user: userData }));
             }
         } catch (error) {
