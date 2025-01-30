@@ -57,43 +57,27 @@ const TrackShipment = () => {
             await addDoc(collection(fireStore, "tracking"), trackResult);
             message.success("Tracking data saved successfully!");
         } catch (error) {
-            console.error("Error saving tracking data: ", error);
             message.error("Failed to save tracking data!");
         }
     };
 
     return (
-        <main style={{ height: "100vh" }} className="d-flex justify-content-center align-items-center">
+        <main className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
             <Container>
-                <Row className="d-flex justify-content-center align-items-center">
+                <Row className="d-flex justify-content-center align-items-center" >
                     <Col span={24}>
-                        <Card>
+                        <Card className="mt-5">
                             <Title level={1}>Track Shipment</Title>
                             <label className="fw-bolder mb-4">Enter CN Number:</label>
-                            <Input
-                                className="mb-4"
-                                type="text"
-                                value={trackCN}
-                                onChange={handleTrackCNChange}
-                                onKeyDown={handleKeyPress}
-                                placeholder="Enter CN Number"
-                            />
-                            <Button
-                                className="w-25 p-3 "
-                                type="primary"
-                                onClick={trackShipment}
-                            >
+                            <Input className="mb-4" type="text" value={trackCN} onChange={handleTrackCNChange} onKeyDown={handleKeyPress} placeholder="Enter CN Number" />
+                            <Button className="w-25 p-3 " type="primary" onClick={trackShipment}                            >
                                 Track
                             </Button>
                             {trackResult ? (
                                 <div>
+                                    <hr />
                                     <h3 className="text-center">{trackResult.riderName}</h3>
-                                    <Table
-                                        border="3"
-                                        bordered
-                                        style={{ marginTop: '20px', width: '100%', textAlign: 'left' }}
-                                        rowKey={(record) => record.id} // Ensure unique rowKey
-                                    >
+                                    <Table border="3" bordered style={{ marginTop: '20px', width: '100%', textAlign: 'left' }} rowKey={(record) => record.id}>
                                         <thead>
                                             <tr>
                                                 <th>Rider</th>
@@ -111,13 +95,6 @@ const TrackShipment = () => {
                                             </tr>
                                         </tbody>
                                     </Table>
-                                    {/* <Button
-                                        className="bg-success text-light"
-                                        onClick={saveTrackingData}
-                                        style={{ marginTop: "1rem" }}
-                                    >
-                                        Save Tracking Data
-                                    </Button> */}
                                 </div>
                             ) : trackCN && (
                                 <p style={{ color: 'red', marginTop: '20px' }}>

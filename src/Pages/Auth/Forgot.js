@@ -11,18 +11,15 @@ const Frogot = () => {
     const navigate = useNavigate()
     const [state, steState] = useState({ email: "" })
     const [isProcessing, setIsProcessing] = useState(false)
-
     const handleChange = e => steState({ ...state, [e.target.name]: e.target.value })
-
     const handleSubmit = e => {
         e.preventDefault();
         let { email } = state
         setIsProcessing(true)
         sendPasswordResetEmail(auth, email, { url: 'http://localhost:3000/auth/login' })
-
             .then(() => {
                 message.success("Email send  Successfully")
-                navigate('/auth/login')
+                navigate('/')
             })
             .catch(() => {
                 message.info("This Account Can't Register")

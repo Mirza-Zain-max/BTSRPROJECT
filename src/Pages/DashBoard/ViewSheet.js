@@ -18,18 +18,15 @@ const ViewSheet = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch riders data
         const ridersQuery = query(collection(fireStore, "riders"));
         const ridersSnapshot = await getDocs(ridersQuery);
         const ridersList = ridersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setRiders(ridersList);
-        // Fetch deliveries data
         const deliveriesQuery = query(collection(fireStore, "deliveries"));
         const deliveriesSnapshot = await getDocs(deliveriesQuery);
         const deliveriesList = deliveriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setDeliveries(deliveriesList);
       } catch (error) {
-        console.error("Error fetching data: ", error);
         message.error("Failed to fetch data from Firestore!");
       }
     };
@@ -52,21 +49,18 @@ const ViewSheet = () => {
       .filter((d) => d.riderName === riderName && d.date === delivery.date)
       .map((d) => ({
         ...d,
-        riderName, // Adding rider name for display
+        riderName,
       }));
     setDeliverySheetData(filteredDeliveries);
   };
-
   const downloadPDFSheet = () => {
     const doc = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: 'a4'
+      format: 'a4',
     });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-
-    // Center the title
     const title = "Delivery Sheet";
     const titleWidth = doc.getTextWidth(title);
     doc.text(title, (pageWidth - titleWidth) / 2, 20);
@@ -84,11 +78,11 @@ const ViewSheet = () => {
       const secondItem = deliverySheetData[i + 1] || {};
       bodyData.push([
         i + 1,
-        `${firstItem.cnNumber}\n${firstItem.riderName}`,
+        `${firstItem.cnNumber}\n${firstItem.consigneeName}`,
         '',
         '',
         i + 2,
-        `${secondItem.cnNumber || ''}\n${secondItem.riderName || ''}`,
+        `${secondItem.cnNumber || ''}\n${secondItem.consigneeName || ''}`,
         '',
         firstItem.date,
       ]);
@@ -106,7 +100,7 @@ const ViewSheet = () => {
       ]);
     }
     doc.autoTable({
-      head: [["Index", "CN Number / Rider Name", "Receiver Name / Stamp", "", "Index", "CN Number & Rider Name", "Receiver Name / Stamp"]],
+      head: [["Index", "CN Number / Consignee Name / Rider Name", "Receiver Name / Stamp", "", "Index", "CN Number / Consignee Name / Rider Name", "Receiver Name / Stamp"]],
       body: bodyData,
       startY: 50,
       styles: {
@@ -117,34 +111,15 @@ const ViewSheet = () => {
       tableWidth: 'auto',
       margin: { top: 50, bottom: 20 },
     });
-    doc.save("delivery_sheet.pdf");
+    const fileName = `${deliverySheetData[0]?.date}_${deliverySheetData[0]?.consigneeName}.pdf`;
+    doc.save(fileName);
   };
   const columns = [
-    {
-      title: "Index",
-      dataIndex: "index",
-      key: "index",
-    },
-    {
-      title: "CN Number",
-      dataIndex: "cnNumber",
-      key: "cnNumber",
-    },
-    {
-      title: "Consignee Name",
-      dataIndex: "consigneeName",
-      key: "consigneeName",
-    },
-    {
-      title: "Receiver Name",
-      dataIndex: "receiverName",
-      key: "receiverName",
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
+    { title: "Index", dataIndex: "index", key: "index" },
+    { title: "CN Number", dataIndex: "cnNumber", key: "cnNumber" },
+    { title: "Consignee Name", dataIndex: "consigneeName", key: "consigneeName" },
+    { title: "Receiver Name", dataIndex: "receiverName", key: "receiverName" },
+    { title: "Date", dataIndex: "date", key: "date" },
   ];
   const indexedDeliverySheetData = deliverySheetData.map((item, index) => ({
     ...item,
@@ -152,60 +127,30 @@ const ViewSheet = () => {
   }));
 
   return (
-    <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+    <main className="d-flex justify-content-center align-items-center" >
       <Container>
         <Row className="d-flex justify-content-center align-items-center">
           <Col span={24}>
-            <Card>
+            <Card className="mt-5">
               <Title level={1}>View Delivery Sheet</Title>
               <label>Select Rider:</label>
-              <Select
-                name="riderId"
-                value={delivery.riderId}
-                onChange={(value) => handleDeliveryChange("riderId", value)}
-                style={{ width: "100%", marginBottom: "1rem" }}
-                placeholder="Select a rider"
-              >
-                {riders.map((rider) => (
-                  <Option key={rider.id} value={rider.id}>
-                    {rider.name}
-                  </Option>
+              <Select name="riderId" value={delivery.riderId} onChange={(value) => handleDeliveryChange("riderId", value)} style={{ width: "100%", marginBottom: "1rem" }} placeholder="Select a rider">
+                {riders.map((rider) => (<Option key={rider.id} value={rider.id}>
+                  {rider.name}
+                </Option>
                 ))}
               </Select>
               <label>Select Date:</label>
-              <Input
-                type="date"
-                name="date"
-                value={delivery.date}
-                onChange={(e) => handleDeliveryChange("date", e.target.value)}
-                style={{ width: "100%", marginBottom: "1rem" }}
-              />
-              <Button
-                type="primary"
-                onClick={viewDeliverySheet}
-                style={{ marginBottom: "1rem" }}
-              >
+              <Input type="date" name="date" value={delivery.date} onChange={(e) => handleDeliveryChange("date", e.target.value)} style={{ width: "100%", marginBottom: "1rem" }} />
+              <Button type="primary" onClick={viewDeliverySheet} style={{ marginBottom: "1rem" }}>
                 View Delivery Sheet
               </Button>
-
               {deliverySheetData.length > 0 ? (
-                <div  style={{ textAlign: 'center' }}>
+                <div style={{ textAlign: 'center' }}>
                   <hr />
                   <h2 className="text-center">{deliverySheetData[0]?.riderName}</h2>
-                  <Table
-                  bordered
-                    id="deliverySheet"
-                    columns={columns}
-                    dataSource={indexedDeliverySheetData}
-                    rowKey="id" // Use the unique id from the data as the rowKey
-                    pagination={false}
-                    className="text-center border-2"
-                  />
-                  <Button
-                    className="bg-success text-light"
-                    onClick={downloadPDFSheet}
-                    style={{ marginTop: "1rem" }}
-                  >
+                  <Table bordered id="deliverySheet" columns={columns} dataSource={indexedDeliverySheetData} rowKey="id" pagination={false} className="text-center border-2 h-auto" />
+                  <Button className="bg-success text-light" onClick={downloadPDFSheet} style={{ marginTop: "1rem" }}>
                     Download as PDF
                   </Button>
                 </div>
