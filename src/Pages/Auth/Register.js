@@ -24,7 +24,7 @@ const Register = () => {
         createUserWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 const user = userCredential.user;
-                const userData = { uid: user.uid, fullName, email };
+                const userData = { uid: user.uid, fullName, email, password , confirmPassword };
                 await setDoc(doc(fireStore, "users", user.uid), userData);
                 createDocument({ ...userData, uid: user.uid });
                 message.success("User registered successfully!");
