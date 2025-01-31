@@ -4,7 +4,7 @@ import "jspdf-autotable";
 import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
-import { collection, getDocs, query } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -38,21 +38,61 @@ const ViewSheet = () => {
     setDelivery((prev) => ({ ...prev, [name]: value }));
   };
 
-  const viewDeliverySheet = () => {
+  // const viewDeliverySheet = () => {
+  //   if (!delivery.riderId || !delivery.date) {
+  //     message.error("Please select both rider and date!");
+  //     return;
+  //   }
+  //   const selectedRider = riders.find(rider => rider.id === delivery.riderId);
+  //   const riderName = selectedRider ? selectedRider.name : "";
+  //   const filteredDeliveries = deliveries
+  //     .filter((d) => d.riderName === riderName && d.date === delivery.date)
+  //     .map((d) => ({
+  //       ...d,
+  //       riderName,
+  //     }));
+  //   setDeliverySheetData(filteredDeliveries);
+  // };
+  const viewDeliverySheet = async () => {
     if (!delivery.riderId || !delivery.date) {
       message.error("Please select both rider and date!");
       return;
     }
-    const selectedRider = riders.find(rider => rider.id === delivery.riderId);
-    const riderName = selectedRider ? selectedRider.name : "";
-    const filteredDeliveries = deliveries
-      .filter((d) => d.riderName === riderName && d.date === delivery.date)
-      .map((d) => ({
-        ...d,
-        riderName,
+  
+    try {
+      // Fetch selected rider's name based on riderId
+      const selectedRider = riders.find(rider => rider.id === delivery.riderId);
+      if (!selectedRider) {
+        message.error("Invalid Rider Selected!");
+        return;
+      }
+  
+      const riderName = selectedRider.name; // Ensure this matches Firestore data exactly
+  
+      // Firestore Query: Fetch deliveries with matching rider and date
+      const deliveriesQuery = query(
+        collection(fireStore, "deliveries"),
+        where("riderName", "==", riderName),
+        where("date", "==", delivery.date)
+      );
+  
+      const deliveriesSnapshot = await getDocs(deliveriesQuery);
+  
+      // Process the retrieved documents
+      const filteredDeliveries = deliveriesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
       }));
-    setDeliverySheetData(filteredDeliveries);
+  
+      // Update state with filtered deliveries
+      setDeliverySheetData(filteredDeliveries);
+    } catch (error) {
+      console.error("Error fetching filtered deliveries: ", error);
+      message.error("Failed to fetch delivery sheet data!");
+    }
   };
+  
+  
   const downloadPDFSheet = () => {
     const doc = new jsPDF({
       orientation: 'portrait',
