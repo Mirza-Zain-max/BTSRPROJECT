@@ -1,27 +1,33 @@
-// import React from 'react'
-// import AddRider from './AddRider'
-// import { Route, Routes } from 'react-router-dom'
-// import ShowData from './ShowData'
-// import RunSheet from './RunSheet'
-// import TrackShipment from './Tracking'
-// import ViewSheet from './ViewSheet'
-// import Header1 from '../../Components/Header/Header'
+import { ArrowRightOutlined } from '@ant-design/icons';
+import { Button, Col, Row, Typography } from 'antd'
+import React from 'react'
+import { Container } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
-// const Dashboard = () => {
-//     return (
-//         <>
-//         <Header1/>
-//             <main>
-//                 <Routes>
-//                     <Route path='/add' element={<AddRider />} />
-//                     <Route path='/showData' element={<ShowData />} />
-//                     <Route path="/make-delivery" element={<RunSheet />} />
-//                     <Route path="/track-shipment" element={<TrackShipment />} />
-//                     <Route path="/view-sheet" element={<ViewSheet />} />
-//                 </Routes>
-//             </main>
-//         </>
-//     )
-// }
+const Dashboard = () => {
+    const { Title } = Typography;
+    const navigate =useNavigate()
+    return (
+        <>
+          <main className='d-flex justify-content-center align-items-center auth' >
+          <Container>
+                <Row className='d-flex justify-content-center align-items-center'>
+                    <Col span={24}>
+                        <h1 className='display-2 fw-bolder text-light'>
+                            Welcome To Naveed Courier & Cargo Services
+                        </h1>
+                     <Col span={24} className=' d-flex justify-content-center align-items-center'>
+                     <Button className='fw-bolder mt-2 d-flex justify-content-center align-items-center border-0' onClick={()=>{navigate("/add")}} style={{backgroundColor:"cyan" , color:"black"}}>
+                       Get Started
+                        <ArrowRightOutlined />
+                       </Button>
+                     </Col>
+                    </Col>
+                </Row>
+            </Container>
+          </main>
+        </>
+    )
+}
 
-// export default Dashboard;
+export default Dashboard

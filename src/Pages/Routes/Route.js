@@ -10,6 +10,7 @@ import ShowData from '../DashBoard/ShowData';
 import RunSheet from '../DashBoard/RunSheet';
 import ViewSheet from '../DashBoard/ViewSheet';
 import TrackShipment from '../DashBoard/Tracking';
+import Dashboard from '../DashBoard/Dashboard';
 
 const FrontEnd = () => {
   return (
@@ -23,7 +24,8 @@ const FrontEnd = () => {
 
       {/* Private Routes (Only accessible to authenticated users) */}
       <Route element={<PrivateRoutes />}>
-        <Route path="/" element={<AddRider />} />
+      <Route path='/' element={<Dashboard/>}/>
+        <Route path="/add" element={<AddRider />} />
         <Route path="/showData" element={<ShowData />} />
         <Route path="/make-delivery" element={<RunSheet />} />
         <Route path="/track-shipment" element={<TrackShipment />} />

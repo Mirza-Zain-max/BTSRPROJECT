@@ -7,7 +7,7 @@ import Header1 from './Components/Header/Header';
 
 const App = () => {
   const location = useLocation()
-  const validPath=['/auth/',]
+  const validPath=['/auth/']
   return (
     <>
     {!validPath.some(item=>location.pathname.startsWith(item)) && <Header1/>}
