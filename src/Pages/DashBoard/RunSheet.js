@@ -145,7 +145,7 @@ import { useAuthContext } from "../../Context/Auth";
 const { Option } = Select;
 
 const RunSheet = () => {
-    const {user} = useAuthContext()
+    const { user } = useAuthContext()
     const { Title } = Typography;
     const [riders, setRiders] = useState([]);
     const [deliveries, setDeliveries] = useState([]);
@@ -164,17 +164,29 @@ const RunSheet = () => {
 
     //     fetchRiders();
     // }, []);
-
     useEffect(() => {
-                const fetchRiders = async () => {
-                    const q = query(collection(fireStore, "riders"));
-                    const querySnapshot = await getDocs(q);
-                    const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    setRiders(ridersList);
-                };
-        
-                fetchRiders();
-            }, []);
+        const fetchRiders = async () => {
+            const q = query(collection(fireStore, "riders"));
+            const querySnapshot = await getDocs(q);
+            const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setRiders(ridersList);
+        };
+
+        fetchRiders();
+    }, []);
+
+
+
+    // useEffect(() => {
+    //             const fetchRiders = async () => {
+    //                 const q = query(collection(fireStore, "riders"));
+    //                 const querySnapshot = await getDocs(q);
+    //                 const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    //                 setRiders(ridersList);
+    //             };
+
+    //             fetchRiders();
+    //         }, []);
 
     const handleDeliveryChange = (e, name = null) => {
         if (name) {
@@ -196,27 +208,57 @@ const RunSheet = () => {
         }
     };
 
+    // const saveDelivery = async (e) => {
+    //     e.preventDefault();
+    //     if (!delivery.riderId || !delivery.date || !delivery.cnNumber || !delivery.consigneeName) {
+    //         message.error('Please fill all fields!');
+    //         return;
+    //     }
+
+    //     const q = query(collection(fireStore, "deliveries"), where("cnNumber", "==", delivery.cnNumber));
+    //     const querySnapshot = await getDocs(q);
+    //     if (!querySnapshot.empty) {
+    //         return message.error('CN Number already exists!');
+    //     }
+
+    //     const selectedRider = riders.find(rider => rider.id === delivery.riderId);
+    //     const newDelivery = {
+    //         ...delivery,
+    //         riderName: selectedRider ? selectedRider.name : "Unknown",
+    //     };
+
+    //     try {
+    //         const docRef = await addDoc(collection(fireStore, "deliveries"), newDelivery);
+    //         setDeliveries((prevDeliveries) => [...prevDeliveries, { id: docRef.id, ...newDelivery }]);
+    //         setDelivery((prev) => ({
+    //             ...prev,
+    //             cnNumber: '',
+    //             consigneeName: '',
+    //         }));
+    //         message.success('Delivery saved successfully!');
+    //     } catch (error) {
+    //         console.error("Error adding document: ", error);
+    //         message.error('Failed to save delivery!');
+    //     } finally {
+    //         if (cnNumberRef.current) {
+    //             cnNumberRef.current.focus();
+    //         }
+    //     }
+    // };
+
     const saveDelivery = async (e) => {
         e.preventDefault();
         if (!delivery.riderId || !delivery.date || !delivery.cnNumber || !delivery.consigneeName) {
             message.error('Please fill all fields!');
             return;
         }
-
-        const q = query(collection(fireStore, "deliveries")
-        // , where("cnNumber", "==", delivery.cnNumber)
-    );
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-            return message.error('CN Number already exists!');
-        }
-
+    
         const selectedRider = riders.find(rider => rider.id === delivery.riderId);
         const newDelivery = {
             ...delivery,
             riderName: selectedRider ? selectedRider.name : "Unknown",
         };
-
+    
         try {
             const docRef = await addDoc(collection(fireStore, "deliveries"), newDelivery);
             setDeliveries((prevDeliveries) => [...prevDeliveries, { id: docRef.id, ...newDelivery }]);
@@ -235,7 +277,7 @@ const RunSheet = () => {
             }
         }
     };
-
+    
     return (
         <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
             <Container>

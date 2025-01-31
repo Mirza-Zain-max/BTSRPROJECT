@@ -38,62 +38,60 @@ const ViewSheet = () => {
     setDelivery((prev) => ({ ...prev, [name]: value }));
   };
 
-  // const viewDeliverySheet = () => {
-  //   if (!delivery.riderId || !delivery.date) {
-  //     message.error("Please select both rider and date!");
-  //     return;
-  //   }
-  //   const selectedRider = riders.find(rider => rider.id === delivery.riderId);
-  //   const riderName = selectedRider ? selectedRider.name : "";
-  //   const filteredDeliveries = deliveries
-  //     .filter((d) => d.riderName === riderName && d.date === delivery.date)
-  //     .map((d) => ({
-  //       ...d,
-  //       riderName,
-  //     }));
-  //   setDeliverySheetData(filteredDeliveries);
-  // };
-  const viewDeliverySheet = async () => {
+  const viewDeliverySheet = () => {
     if (!delivery.riderId || !delivery.date) {
       message.error("Please select both rider and date!");
       return;
     }
-    try {
-      // Fetch selected rider's name based on riderId
-      const selectedRider = riders.find(rider => rider.id === delivery.riderId);
-      if (!selectedRider) {
-        message.error("Invalid Rider Selected!");
-        return;
-      }
-
-      const riderName = selectedRider.name; // Ensure this matches Firestore data exactly
-
-      // Firestore Query: Fetch deliveries with matching rider and date
-      const deliveriesQuery = query(
-        collection(fireStore, "deliveries"),
-        // where("riderName", "==", riderName),
-        // where("date", "==", delivery.date)
-      );
-
-      const deliveriesSnapshot = await getDocs(deliveriesQuery);
-
-      // Process the retrieved documents
-      const filteredDeliveries = deliveriesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
+    const selectedRider = riders.find(rider => rider.id === delivery.riderId);
+    const riderName = selectedRider ? selectedRider.name : "";
+    const filteredDeliveries = deliveries
+      .filter((d) => d.riderName === riderName && d.date === delivery.date)
+      .map((d) => ({
+        ...d,
+        riderName,
       }));
-
-      // Update state with filtered deliveries
-      setDeliverySheetData(filteredDeliveries);
-    } catch (error) {
-      console.error("Error fetching filtered deliveries: ", error);
-      message.error("Failed to fetch delivery sheet data!");
-    }finally{
-      message.error("Failed to fetch delivery sheet data!")
-    }
+    setDeliverySheetData(filteredDeliveries);
   };
+  // const viewDeliverySheet = async () => {
+  //   if (!delivery.riderId || !delivery.date) {
+  //     message.error("Please select both rider and date!");
+  //     return;
+  //   }
+  //   try {
+  //     // Fetch selected rider's name based on riderId
+  //     const selectedRider = riders.find(rider => rider.id === delivery.riderId);
+  //     if (!selectedRider) {
+  //       message.error("Invalid Rider Selected!");
+  //       return;
+  //     }
 
+  //     const riderName = selectedRider.name; // Ensure this matches Firestore data exactly
 
+  //     // Firestore Query: Fetch deliveries with matching rider and date
+  //     const deliveriesQuery = query(
+  //       collection(fireStore, "deliveries"),
+  //       // where("riderName", "==", riderName),
+  //       // where("date", "==", delivery.date)
+  //     );
+
+  //     const deliveriesSnapshot = await getDocs(deliveriesQuery);
+
+  //     // Process the retrieved documents
+  //     const filteredDeliveries = deliveriesSnapshot.docs.map(doc => ({
+  //       id: doc.id,
+  //       ...doc.data(),
+  //     }));
+
+  //     // Update state with filtered deliveries
+  //     setDeliverySheetData(filteredDeliveries);
+  //   } catch (error) {
+  //     console.error("Error fetching filtered deliveries: ", error);
+  //     message.error("Failed to fetch delivery sheet data!");
+  //   }finally{
+  //     message.error("Failed to fetch delivery sheet data!")
+  //   }
+  // };
   const downloadPDFSheet = () => {
     const doc = new jsPDF({
       orientation: 'portrait',
@@ -101,7 +99,6 @@ const ViewSheet = () => {
       format: 'a4',
     });
     const pageWidth = doc.internal.pageSize.getWidth();
-    // const pageHeight = doc.internal.pageSize.getHeight();
     const title = "Delivery Sheet";
     const titleWidth = doc.getTextWidth(title);
     doc.text(title, (pageWidth - titleWidth) / 2, 20);
@@ -146,11 +143,13 @@ const ViewSheet = () => {
       startY: 50,
       styles: {
         lineColor: [0, 0, 0],
-        lineWidth: 0.5,
+        lineWidth: 0.3,
+        minCellHeight: 22, // Row height to fill A4 page
+        fontSize: 12,
       },
       pageBreak: 'auto',
       tableWidth: 'auto',
-      margin: { top: 50, bottom: 20 },
+      margin: { top: 30, bottom: 30 },
     });
     const fileName = `${deliverySheetData[0]?.date}_${deliverySheetData[0]?.riderName}.pdf`;
     doc.save(fileName);

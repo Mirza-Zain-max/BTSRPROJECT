@@ -29,17 +29,45 @@ const TrackShipment = () => {
         fetchData();
     }, []);
 
-    const handleTrackCNChange = (e) => { setTrackCN(e.target.value) };
+    // const handleTrackCNChange = (e) => { setTrackCN(e.target.value) };
+    // const trackShipment = () => {
+    //     if (!trackCN.trim()) {
+    //         message.warning("Please enter a CN Number.");
+    //         return;
+    //     }
+    //     const result = deliveries.find(delivery => delivery.cnNumber === trackCN.trim());
+    //     if (result) {
+    //         const rider = riders.find(r => r.id === result.riderId);
+    //         setTrackResult({ ...result, riderName: rider ? rider.name : "Unknown" });
+    //         message.success("Delivery found successfully!");
+    //     } else {
+    //         setTrackResult(null);
+    //         message.error("No delivery found with this CN Number.");
+    //     }
+    // };
+
+    const handleTrackCNChange = (e) => {
+        setTrackCN(e.target.value);
+    };
+
     const trackShipment = () => {
         if (!trackCN.trim()) {
             message.warning("Please enter a CN Number.");
             return;
         }
-        const result = deliveries.find(delivery => delivery.cnNumber === trackCN.trim());
-        if (result) {
-            const rider = riders.find(r => r.id === result.riderId);
-            setTrackResult({ ...result, riderName: rider ? rider.name : "Unknown" });
-            message.success("Delivery found successfully!");
+
+        // Find all deliveries with matching CN Number
+        const results = deliveries.filter(delivery => delivery.cnNumber === trackCN.trim());
+
+        if (results.length > 0) {
+            // Map through results to include rider names
+            const trackedDeliveries = results.map(result => {
+                const rider = riders.find(r => r.id === result.riderId);
+                return { ...result, riderName: rider ? rider.name : "Unknown" };
+            });
+
+            setTrackResult(trackedDeliveries);
+            message.success(`${results.length} deliveries found with this CN Number!`);
         } else {
             setTrackResult(null);
             message.error("No delivery found with this CN Number.");
@@ -62,7 +90,7 @@ const TrackShipment = () => {
     };
 
     return (
-        <main className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
+        <main className="d-flex justify-content-center align-items-center" >
             <Container>
                 <Row className="d-flex justify-content-center align-items-center" >
                     <Col span={24}>
@@ -76,8 +104,8 @@ const TrackShipment = () => {
                             {trackResult ? (
                                 <div>
                                     <hr />
-                                    <h3 className="text-center">{trackResult.riderName}</h3>
-                                    <Table border="3" bordered style={{ marginTop: '20px', width: '100%', textAlign: 'left' }} rowKey={(record) => record.id}>
+                                    <h3 className="text-center">Tracking Shipment</h3>
+                                    {/* <Table border="3" bordered style={{ marginTop: '20px', width: '100%', textAlign: 'left' }} rowKey={(record) => record.id}>
                                         <thead>
                                             <tr>
                                                 <th>Rider</th>
@@ -94,7 +122,30 @@ const TrackShipment = () => {
                                                 <td>{trackResult.receiverName}</td>
                                             </tr>
                                         </tbody>
-                                    </Table>
+                                    </Table> */}
+                                    {trackResult && trackResult.length > 0 && (
+                                        <Table border="1">
+                                            <thead>
+                                                <tr>
+                                                    <th>CN Number</th>
+                                                    <th>Consignee Name</th>
+                                                    <th>Rider Name</th>
+                                                    <th>Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {trackResult.map((delivery, index) => (
+                                                    <tr key={index}>
+                                                        <td>{delivery.cnNumber}</td>
+                                                        <td>{delivery.consigneeName}</td>
+                                                        <td>{delivery.riderName}</td>
+                                                        <td>{delivery.date}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </Table>
+                                    )}
+
                                 </div>
                             ) : trackCN && (
                                 <p style={{ color: 'red', marginTop: '20px' }}>
