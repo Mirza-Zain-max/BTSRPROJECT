@@ -127,30 +127,41 @@ import { fireStore } from "../../Config/firebase";
 import { useAuthContext } from "../../Context/Auth";
 
 const AddRider = () => {
-    const { user } = useAuthContext(); // Get the authenticated user
+    const { user } = useAuthContext();
     const { Title } = Typography;
     const [newRider, setNewRider] = useState({ name: "", contact: "", address: "" });
     const [riders, setRiders] = useState([]);
     const inputRefs = useRef([]);
     const riderNameRef = useRef(null);
 
+    // useEffect(() => {
+    //     if (!user?.uid) return; // Ensure user is logged in before fetching
+
+    //     const fetchRiders = async () => {
+    //         try {
+    //             const q = query(collection(fireStore, "riders")
+    //             // , where("Created_By", "==", user.uid)
+    //         );
+    //             const querySnapshot = await getDocs(q);
+    //             const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    //             setRiders(ridersList);
+    //         } catch (error) {
+    //             console.error("Error fetching riders:", error);
+    //         }
+    //     };
+
+    //     fetchRiders();
+    // }, [user]);
+
     useEffect(() => {
-        if (!user?.uid) return; // Ensure user is logged in before fetching
-
-        const fetchRiders = async () => {
-            try {
-                const q = query(collection(fireStore, "riders"), where("Created_By", "==", user.uid));
-                const querySnapshot = await getDocs(q);
-                const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setRiders(ridersList);
-            } catch (error) {
-                console.error("Error fetching riders:", error);
-            }
-        };
-
-        fetchRiders();
-    }, [user]);
-
+                const fetchRiders = async () => {
+                    const q = query(collection(fireStore, "riders"));
+                    const querySnapshot = await getDocs(q);
+                    const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setRiders(ridersList);
+                };
+                fetchRiders();
+            }, []);
     const handleRiderChange = (e) => {
         const { name, value } = e.target;
         setNewRider((prev) => ({ ...prev, [name]: value }));

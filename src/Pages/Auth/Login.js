@@ -34,7 +34,6 @@ const Login = () => {
                 },1000)
             })
     }
-
     return (
         <main className='auth p-3 p-md-4 p-lg-5'>
             <Fade cascade damping={0.1}>
@@ -60,12 +59,12 @@ const Login = () => {
                                 <Col span={24}>
                                     <Button type='primary' htmlType='submit' onClick={handleSubmit} loading={isProcessing} className='w-100'>Login</Button>
                                 </Col>
-                                <Col span={12}>
+                                {/* <Col span={12}>
                                     <Link to='/auth/forgot' className=' my-2 text-center  nav-link'>Forgot Password</Link>
                                 </Col>
                                 <Col span={12}>
                                     <Link to='/auth/register' className=' my-2 text-center  nav-link'>Register Account</Link>
-                                </Col>
+                                </Col> */}
                             </Row>
                         </Form>
                     </div>

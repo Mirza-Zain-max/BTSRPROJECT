@@ -58,7 +58,6 @@ const ViewSheet = () => {
       message.error("Please select both rider and date!");
       return;
     }
-  
     try {
       // Fetch selected rider's name based on riderId
       const selectedRider = riders.find(rider => rider.id === delivery.riderId);
@@ -66,33 +65,35 @@ const ViewSheet = () => {
         message.error("Invalid Rider Selected!");
         return;
       }
-  
+
       const riderName = selectedRider.name; // Ensure this matches Firestore data exactly
-  
+
       // Firestore Query: Fetch deliveries with matching rider and date
       const deliveriesQuery = query(
         collection(fireStore, "deliveries"),
-        where("riderName", "==", riderName),
-        where("date", "==", delivery.date)
+        // where("riderName", "==", riderName),
+        // where("date", "==", delivery.date)
       );
-  
+
       const deliveriesSnapshot = await getDocs(deliveriesQuery);
-  
+
       // Process the retrieved documents
       const filteredDeliveries = deliveriesSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
-  
+
       // Update state with filtered deliveries
       setDeliverySheetData(filteredDeliveries);
     } catch (error) {
       console.error("Error fetching filtered deliveries: ", error);
       message.error("Failed to fetch delivery sheet data!");
+    }finally{
+      message.error("Failed to fetch delivery sheet data!")
     }
   };
-  
-  
+
+
   const downloadPDFSheet = () => {
     const doc = new jsPDF({
       orientation: 'portrait',

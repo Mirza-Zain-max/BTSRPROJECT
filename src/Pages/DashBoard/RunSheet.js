@@ -152,16 +152,29 @@ const RunSheet = () => {
     const [delivery, setDelivery] = useState({ riderId: "", date: '', cnNumber: '', consigneeName: '' });
     const cnNumberRef = useRef(null);
 
-    useEffect(() => {
-        const fetchRiders = async () => {
-            const q = query(collection(fireStore, "riders") , where("Created_By" ,"==" , user.uid));
-            const querySnapshot = await getDocs(q);
-            const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setRiders(ridersList);
-        };
+    // useEffect(() => {
+    //     const fetchRiders = async () => {
+    //         const q = query(collection(fireStore, "riders") 
+    //         // , where("Created_By" ,"==" , user.uid)
+    //     );
+    //         const querySnapshot = await getDocs(q);
+    //         const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    //         setRiders(ridersList);
+    //     };
 
-        fetchRiders();
-    }, []);
+    //     fetchRiders();
+    // }, []);
+
+    useEffect(() => {
+                const fetchRiders = async () => {
+                    const q = query(collection(fireStore, "riders"));
+                    const querySnapshot = await getDocs(q);
+                    const ridersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setRiders(ridersList);
+                };
+        
+                fetchRiders();
+            }, []);
 
     const handleDeliveryChange = (e, name = null) => {
         if (name) {
@@ -190,7 +203,9 @@ const RunSheet = () => {
             return;
         }
 
-        const q = query(collection(fireStore, "deliveries"), where("cnNumber", "==", delivery.cnNumber));
+        const q = query(collection(fireStore, "deliveries")
+        // , where("cnNumber", "==", delivery.cnNumber)
+    );
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
             return message.error('CN Number already exists!');
