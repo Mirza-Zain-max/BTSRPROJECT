@@ -2,7 +2,7 @@ import { Button, Card, Col, Input, message, Row, Typography } from "antd";
 import React, { useState, useEffect } from "react";
 import { Container, Table } from "react-bootstrap";
 import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
-import { collection, getDocs, query } from "firebase/firestore";
+import { addDoc, collection, getDocs, query } from "firebase/firestore";
 
 const TrackShipment = () => {
     const [deliveries, setDeliveries] = useState([]);
@@ -76,18 +76,18 @@ const TrackShipment = () => {
 
     const handleKeyPress = (event) => { if (event.key === "Enter") { trackShipment() } };
 
-    // const saveTrackingData = async () => {
-    //     if (!trackResult) {
-    //         message.error("No tracking data to save.");
-    //         return;
-    //     }
-    //     try {
-    //         await addDoc(collection(fireStore, "tracking"), trackResult);
-    //         message.success("Tracking data saved successfully!");
-    //     } catch (error) {
-    //         message.error("Failed to save tracking data!");
-    //     }
-    // };
+    const saveTrackingData = async () => {
+        if (!trackResult) {
+            message.error("No tracking data to save.");
+            return;
+        }
+        try {
+            await addDoc(collection(fireStore, "tracking"), trackResult);
+            message.success("Tracking data saved successfully!");
+        } catch (error) {
+            message.error("Failed to save tracking data!");
+        }
+    };
 
     return (
         <main className="d-flex justify-content-center align-items-center" >
@@ -140,7 +140,7 @@ const TrackShipment = () => {
                                                         <td>{delivery.cnNumber}</td>
                                                         <td>{delivery.consigneeName}</td>
                                                         <td>{delivery.riderName}</td>
-                                                        <td>{delivery``.receiverName}</td>
+                                                        <td>{delivery.receiverName}</td>
                                                         <td>{delivery.date}</td>
                                                     </tr>
                                                 ))}
