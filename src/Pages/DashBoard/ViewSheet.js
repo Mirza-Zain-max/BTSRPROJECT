@@ -4,7 +4,7 @@ import "jspdf-autotable";
 import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query} from "firebase/firestore";
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -138,13 +138,13 @@ const ViewSheet = () => {
       ]);
     }
     doc.autoTable({
-      head: [["Index", "CN Number / Consignee Name ", "Receiver Name / Stamp", "", "Index", "CN Number / Consignee Name", "Receiver Name / Stamp"]],
+      head: [["Index", "CN Number / Consignee Name ", "Receiver Name / Signature /Stamp", "", "Index", "CN Number / Consignee Name", "Receiver Name / Signature /Stamp"]],
       body: bodyData,
       startY: 50,
       styles: {
         lineColor: [0, 0, 0],
         lineWidth: 0.3,
-        minCellHeight: 22, // Row height to fill A4 page
+        minCellHeight: 20, // Row height to fill A4 page
         fontSize: 12,
       },
       pageBreak: 'auto',
