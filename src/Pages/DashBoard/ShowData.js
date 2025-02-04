@@ -503,10 +503,10 @@ const ShowData = () => {
                             <Button type="primary" className="mb-3" onClick={handleSaveReciver}                            >
                                 Save Receiver Names
                             </Button>
-                            <Table loading={loading} dataSource={filteredData} rowKey={(record) => record.id} pagination={false}
+                            <Table loading={loading} dataSource={filteredData} rowKey={(record) => record.id} pagination={{pageSize: 20}}
                                 columns={[{
                                     title: "Rider Name",
-                                    key: "riderName",
+                                    key: "riderName", theme: 'grid',
                                     render: (record) => {
                                         const rider = riders.find(
                                             (r) => r.id === record.riderId

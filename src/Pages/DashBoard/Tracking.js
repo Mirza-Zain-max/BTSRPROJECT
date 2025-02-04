@@ -29,24 +29,7 @@ const TrackShipment = () => {
         fetchData();
     }, []);
 
-    // const handleTrackCNChange = (e) => { setTrackCN(e.target.value) };
-    // const trackShipment = () => {
-    //     if (!trackCN.trim()) {
-    //         message.warning("Please enter a CN Number.");
-    //         return;
-    //     }
-    //     const result = deliveries.find(delivery => delivery.cnNumber === trackCN.trim());
-    //     if (result) {
-    //         const rider = riders.find(r => r.id === result.riderId);
-    //         setTrackResult({ ...result, riderName: rider ? rider.name : "Unknown" });
-    //         message.success("Delivery found successfully!");
-    //     } else {
-    //         setTrackResult(null);
-    //         message.error("No delivery found with this CN Number.");
-    //     }
-    // };
-
-    const handleTrackCNChange = (e) => {
+      const handleTrackCNChange = (e) => {
         setTrackCN(e.target.value);
     };
 
@@ -56,11 +39,9 @@ const TrackShipment = () => {
             return;
         }
 
-        // Find all deliveries with matching CN Number
         const results = deliveries.filter(delivery => delivery.cnNumber === trackCN.trim());
 
         if (results.length > 0) {
-            // Map through results to include rider names
             const trackedDeliveries = results.map(result => {
                 const rider = riders.find(r => r.id === result.riderId);
                 return { ...result, riderName: rider ? rider.name : "Unknown" };
@@ -90,10 +71,10 @@ const TrackShipment = () => {
     };
 
     return (
-        <main className="d-flex justify-content-center align-items-center" >
+        <main className="d-flex justify-content-center align-items-center auth" >
             <Container>
                 <Row className="d-flex justify-content-center align-items-center" >
-                    <Col span={24}>
+                    <Col span={18}>
                         <Card className="mt-5">
                             <Title level={1}>Track Shipment</Title>
                             <label className="fw-bolder mb-4">Enter CN Number:</label>
@@ -101,51 +82,37 @@ const TrackShipment = () => {
                             <Button className="w-25 p-3 " type="primary" onClick={trackShipment}                            >
                                 Track
                             </Button>
+                            <Button className="w-25 p-3 d-none " type="primary" onClick={saveTrackingData}                            >
+                                save
+                            </Button>
                             {trackResult ? (
                                 <div>
                                     <hr />
-                                    <h3 className="text-center">Tracking Shipment</h3>
-                                    {/* <Table border="3" bordered style={{ marginTop: '20px', width: '100%', textAlign: 'left' }} rowKey={(record) => record.id}>
+                                    {trackResult && trackResult.length > 0 && (
+                                        <Table border="2" bordered className="border-black">
                                         <thead>
                                             <tr>
-                                                <th>Rider</th>
-                                                <th>Date</th>
-                                                <th>Consignee Name</th>
-                                                <th>Receiver Name</th>
+                                                <th className="text-center">Index</th>
+                                                <th className="text-center">CN Number</th>
+                                                <th className="text-center">Consignee Name</th>
+                                                <th className="text-center">Rider Name</th>
+                                                <th className="text-center">Receiver Name</th>
+                                                <th className="text-center">Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>{trackResult.riderName}</td>
-                                                <td>{trackResult.date}</td>
-                                                <td>{trackResult.consigneeName}</td>
-                                                <td>{trackResult.receiverName}</td>
-                                            </tr>
-                                        </tbody>
-                                    </Table> */}
-                                    {trackResult && trackResult.length > 0 && (
-                                        <Table border="1">
-                                            <thead>
-                                                <tr>
-                                                    <th>CN Number</th>
-                                                    <th>Consignee Name</th>
-                                                    <th>Rider Name</th>
-                                                    <th>Receiver Name</th>
-                                                    <th>Date</th>
+                                            {trackResult.map((delivery, index) => (
+                                                <tr key={index}>
+                                                    <td className="fs-6 text-center">{index+1}</td>
+                                                    <td className="text-center">{delivery.cnNumber}</td>
+                                                    <td className="text-center">{delivery.consigneeName}</td>
+                                                    <td className="text-center">{delivery.riderName}</td>
+                                                    <td className="text-center">{delivery.receiverName}</td>
+                                                    <td className="text-center">{delivery.date}</td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                {trackResult.map((delivery, index) => (
-                                                    <tr key={index}>
-                                                        <td>{delivery.cnNumber}</td>
-                                                        <td>{delivery.consigneeName}</td>
-                                                        <td>{delivery.riderName}</td>
-                                                        <td>{delivery.receiverName}</td>
-                                                        <td>{delivery.date}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
+                                            ))}
+                                        </tbody>
+                                    </Table>
                                     )}
 
                                 </div>
