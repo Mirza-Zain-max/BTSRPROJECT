@@ -143,11 +143,11 @@ const RunSheet = () => {
     };
     
     return (
-        <main className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+        <main className="d-flex justify-content-center align-items-center auth"  >
             <Container>
                 <Row className="d-flex justify-content-center align-items-center">
                     <Col>
-                        <Card className="border-2 border-bottom border-black">
+                        <Card style={{backgroundColor:"#d6d6d6"}}  className="border-2 border-bottom border-black">
                             <Title level={1}>Make Delivery Sheet</Title>
                             <form onSubmit={saveDelivery}>
                                 <label className="fw-bolder my-2 me-3">Select Rider:</label>
@@ -170,16 +170,12 @@ const RunSheet = () => {
                                         ))}
                                     </Select>
                                 )}
-
                                 <label className="fw-bolder mb-2">Date:</label>
                                 <Input type="date" className="mb-2" name="date" value={delivery.date} onChange={handleDeliveryChange} />
-
                                 <label className="mb-2">CN Number:</label>
                                 <Input type="number" className="mb-2" name="cnNumber" value={delivery.cnNumber} onChange={handleDeliveryChange} ref={cnNumberRef} />
-
                                 <label className="mb-2">Consignee Name:</label>
                                 <Input type="text" className="mb-3" name="consigneeName" value={delivery.consigneeName} onChange={handleDeliveryChange} />
-
                                 <Button type="primary" htmlType="submit">Save Delivery</Button>
                             </form>
                         </Card>

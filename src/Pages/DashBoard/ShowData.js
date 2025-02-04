@@ -474,12 +474,12 @@ const ShowData = () => {
     };
 
     return (
-        <main className="d-flex justify-content-center align-items-center">
-            <Container className="m">
+        <main className=" auth d-flex justify-content-center align-items-center">
+            <Container className="mt-5">
                 <Row>
                     <Col span={24}>
+                        <Card style={{backgroundColor:"#d6d6d6"}} >
                         <h1>Show Data</h1>
-                        <Card>
                             <Select name="riderName" className="my-2 w-100" value={selectedRider} onChange={handleRiderChange}
                                 dropdownRender={menu => (
                                     <>
@@ -503,7 +503,7 @@ const ShowData = () => {
                             <Button type="primary" className="mb-3" onClick={handleSaveReciver}                            >
                                 Save Receiver Names
                             </Button>
-                            <Table loading={loading} dataSource={filteredData} rowKey={(record) => record.id} pagination={{pageSize: 20}}
+                            {/* <Table loading={loading} dataSource={filteredData} rowKey={(record) => record.id} pagination={{pageSize: 20}}
                                 columns={[{
                                     title: "Rider Name",
                                     key: "riderName", theme: 'grid',
@@ -559,7 +559,72 @@ const ShowData = () => {
                                     ),
                                 },
                                 ]}
+                            /> */}
+                            <Table
+                                loading={loading}
+                                dataSource={filteredData}
+                                rowKey={(record) => record.id}
+                                pagination={{ pageSize: 20 }}
+                                columns={[
+                                    {
+                                        title: "#",  // Column Title
+                                        key: "index",
+                                        render: (_, __, index) => index + 1, // Displaying Row Index
+                                    },
+                                    {
+                                        title: "Rider Name",
+                                        key: "riderName",
+                                        theme: 'grid',
+                                        render: (record) => {
+                                            const rider = riders.find((r) => r.id === record.riderId);
+                                            return rider?.name || "Unknown";
+                                        },
+                                    },
+                                    {
+                                        title: "CN Number",
+                                        dataIndex: "cnNumber",
+                                        key: "cnNumber",
+                                    },
+                                    {
+                                        title: "Consignee Name",
+                                        dataIndex: "consigneeName",
+                                        key: "consigneeName",
+                                    },
+                                    {
+                                        title: "Receiver Name",
+                                        key: "receiverName",
+                                        render: (record, _, index) => (
+                                            <Input
+                                                className="border-0"
+                                                defaultValue={record.receiverName}
+                                                ref={(ref) => (inputRefs.current[index] = ref)}
+                                                onChange={(e) => handleReciverChange(e, record.cnNumber)}
+                                                onKeyDown={(e) => handleKeyPress(e, index)}
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        title: "Date",
+                                        dataIndex: "date",
+                                        key: "date",
+                                    },
+                                    {
+                                        title: "Actions",
+                                        key: "actions",
+                                        render: (record) => (
+                                            <div>
+                                                <Button onClick={() => handleEdit(record)}>
+                                                    <EditFilled />
+                                                </Button>
+                                                <Button danger onClick={() => handleDelete(record)}>
+                                                    <DeleteFilled />
+                                                </Button>
+                                            </div>
+                                        ),
+                                    },
+                                ]}
                             />
+
                         </Card>
                     </Col>
                 </Row>

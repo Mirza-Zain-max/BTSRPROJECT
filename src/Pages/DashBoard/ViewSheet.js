@@ -129,11 +129,11 @@ const ViewSheet = () => {
   }));
 
   return (
-    <main className="d-flex justify-content-center align-items-center" >
+    <main className="auth d-flex justify-content-center align-items-center" >
       <Container>
         <Row className="d-flex justify-content-center align-items-center">
           <Col span={24}>
-            <Card className="mt-5">
+            <Card style={{backgroundColor:"#d6d6d6"}}  className="mt-5">
               <Title level={1}>View Delivery Sheet</Title>
               <label>Select Rider:</label>
               <Select name="riderId" value={delivery.riderId} onChange={(value) => handleDeliveryChange("riderId", value)} style={{ width: "100%", marginBottom: "1rem" }} placeholder="Select a rider">

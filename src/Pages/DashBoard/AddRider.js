@@ -228,13 +228,13 @@ const AddRider = () => {
     };
 
     return (
-        <main style={{ height: "100vh" }} className="d-flex justify-content-center align-items-center">
-            <Container>
-                <Row className="d-flex justify-content-center align-items-center">
+        <main className="auth d-flex justify-content-center align-items-center">
+            <Container >
+                <Row  className="d-flex justify-content-center align-items-center">
                     <Col>
+                        <Card style={{backgroundColor:"#d6d6d6"}} className="p-4 my-4 border-black">
                         <Title level={1}>Add Rider</Title>
-                        <Card className="p-4 my-4 border-black">
-                            <label>Rider Name:</label>
+                            <label className="fw-bold">Rider Name:</label>
                             <Input
                                 type="text"
                                 className="my-2"
@@ -245,7 +245,7 @@ const AddRider = () => {
                                 ref={(ref) => { inputRefs.current[0] = ref; riderNameRef.current = ref }}
                                 onKeyDown={(e) => handleKeyPress(e, 0)}
                             />
-                            <label>Contact Number:</label>
+                            <label className="fw-bold">Contact Number:</label>
                             <Input
                                 type="number"
                                 className="my-2"
@@ -256,7 +256,7 @@ const AddRider = () => {
                                 ref={(ref) => inputRefs.current[1] = ref}
                                 onKeyDown={(e) => handleKeyPress(e, 1)}
                             />
-                            <label>Address:</label>
+                            <label className="fw-bold">Address:</label>
                             <Input
                                 type="text"
                                 className="my-2"
