@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Table, Select, DatePicker, Button, Modal, Input, message, Form, Row, Col, Card, Typography, Popconfirm } from "antd";
-import { collection, getDocs, deleteDoc, doc, updateDoc, writeBatch, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, updateDoc, writeBatch, query} from "firebase/firestore";
 import { fireStore } from "../../Config/firebase";
 import { DeleteFilled, EditFilled } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
 
-const { Option } = Select;
+// const { Option } = Select;
 
 const ShowData = () => {
     const { Title } = Typography;
@@ -32,8 +32,8 @@ const ShowData = () => {
     const fetchDeliveries = async () => {
         setLoading(true);
         try {
-            // const queryData = query(collection(fireStore, "deliveries"))
-            const queryData = query(collection(fireStore, "deliveries"), orderBy('createdAt'))
+            const queryData = query(collection(fireStore, "deliveries"))
+            // const queryData = query(collection(fireStore, "deliveries"), orderBy('createdAt'))
             const querySnapshot = await getDocs(queryData);
             const deliveryList = querySnapshot.docs.map(doc => ({
                 id: doc.id,
@@ -73,31 +73,20 @@ const ShowData = () => {
             name: record.receiverName,
             date: record.date,
             consigneeName: record.consigneeName
-        }); // Form fields ko update karein
+        });
         setIsModalVisible(true);
     };
-
-
-    // const handleDelete = async (id) => {
-    //     await deleteDoc(doc(fireStore, "deliveries", id));
-    //     fetchDeliveries();
-    // };
-
     const handleDelete = async (id) => {
         try {
             await deleteDoc(doc(fireStore, "deliveries", id));
-
-            // Remove deleted item from state instead of refetching
             setData(prevData => prevData.filter(item => item.id !== id));
             setFilteredData(prevFiltered => prevFiltered.filter(item => item.id !== id));
-
             message.success("Delivery deleted successfully!");
         } catch (error) {
             console.error("Error deleting delivery:", error);
             message.error("Failed to delete delivery!");
         }
     };
-
     const handleKeyPress = (e, index) => {
         if (e.key === "Enter") {
             inputRefs.current[index]?.blur(); // Remove focus
@@ -105,23 +94,6 @@ const ShowData = () => {
     };
     const handleReciverChange = (e, cnNumber) => { const { value } = e.target; setNewReceiver((prev) => ({ ...prev, [cnNumber]: value })) };
 
-    // const handleSaveReciver = async () => {
-    //     try {
-    //         const batch = writeBatch(fireStore);
-    //         filteredData.forEach((item) => {
-    //             if (newReceiver[item.cnNumber]) {
-    //                 const docRef = doc(fireStore, "deliveries", item.id);
-    //                 batch.update(docRef, { receiverName: newReceiver[item.cnNumber] });
-    //             }
-    //         });
-    //         await batch.commit();
-    //         message.success("Receiver names saved successfully!");
-    //     } catch (error) {
-    //         console.error("Error saving receiver names: ", error);
-    //         message.error("Failed to save receiver names!");
-    //     }
-    // };
-    //    
     const handleSaveReciver = async () => {
         try {
             const batch = writeBatch(fireStore);
@@ -146,8 +118,6 @@ const ShowData = () => {
             setIsModalVisible(false);
         }
     };
-
-
     const handleModalOk = async () => {
         try {
             const values = await form.validateFields();
@@ -159,9 +129,7 @@ const ShowData = () => {
                 date: values.date,
                 consigneeName: values.consigneeName,
             });
-
             await fetchDeliveries(); // Fresh data reload karein
-
             setIsModalVisible(false);
             message.success("Record updated successfully!");
         } catch (error) {
@@ -170,24 +138,13 @@ const ShowData = () => {
         }
     };
 
-
-    // Open Modal with Data
-    // const handleEdit = (record) => {
-    //     setEditingRecord(record);
-    //     form.setFieldsValue(record); // Populate form fields
-    //     setIsModalVisible(true);
-    // };
-
-
     const onSearch = (value) => {
         let filtered = [...data];
-
         if (value) {
             filtered = filtered.filter((delivery) =>
                 delivery.cnNumber?.toString().toLowerCase().includes(value.toLowerCase())
             );
         }
-
         setFilteredData(filtered);
     };
 
@@ -200,18 +157,13 @@ const ShowData = () => {
             setFilteredData(filtered);
         }
         else {
-            setFilteredData(data); // Reset to show all data if searchValue is empty
+            setFilteredData(data);
         }
     };
-    // const handleClearSearch = () => {
-    //     setSearchValue('');
-    //     setFilteredData(data); // Reset to original data
-    // };
+
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchValue(value);
-
-        // If the search input is cleared, reset filteredData to show all data
         if (!value) {
             setFilteredData(data);
         }
@@ -293,25 +245,6 @@ const ShowData = () => {
                             <Card className="border-0">
                                 <Row>
                                     <Col span={12}>
-                                        {/* <Select
-                                            placeholder="Select Rider"
-                                            onChange={(value) => setSelectedRider(value)}
-                                            showSearch
-                                            // placeholder="Search Rider..."
-                                            filterOption={(input, option) =>
-                                                option && option.label && option.label.toLowerCase().includes(input.toLowerCase())
-                                            }
-                                            allowClear
-                                            className="w-75 ">
-                                            <Option key="all" value={null}>
-                                                All Riders
-                                            </Option>
-                                            {riderList.map((rider) => (
-                                                <Option key={rider.id} value={rider.id}>
-                                                    {rider.name}
-                                                </Option>
-                                            ))}
-                                        </Select> */}
                                         <Select
                                             placeholder="Select Rider"
                                             onChange={(value) => setSelectedRider(value)}
@@ -330,19 +263,11 @@ const ShowData = () => {
 
                                     </Col>
                                     <Col span={12}>
-                                        <DatePicker className="border-1 w-75 border-black"
-                                            placeholder="Select Date"
-                                            onChange={setSelectedDate}
-                                        />
+                                        <DatePicker className="border-1 w-75 border-black" placeholder="Select Date" onChange={setSelectedDate} />
                                         <Button className="ms-2 bg-black text-light" onClick={applyFilters}>Apply Filters</Button>
                                     </Col>
                                     <Col span={12} className="mt-3">
-                                        <Input className="border-1 w-75 border-black"
-                                            placeholder="Enter CN Number"
-                                            value={searchValue}
-                                            onChange={handleSearchChange} // Handle the change in the input
-                                            allowClear
-                                        />
+                                        <Input className="border-1 w-75 border-black" placeholder="Enter CN Number" value={searchValue} onChange={handleSearchChange} allowClear />
                                         <Button type="primary" className="ms-2" onClick={handleSearchClick}>
                                             Search
                                         </Button>
