@@ -1,390 +1,127 @@
-// import { Table, Card, Select, DatePicker, Row, Col, Button, Input, message, Modal, Form } from "antd";
-// import React, { useState, useEffect, useRef } from "react";
-// import { Container } from "react-bootstrap";
-// import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
-// import { collection, getDocs, query, writeBatch, doc, deleteDoc, updateDoc, where } from "firebase/firestore";
-
-// const { Option } = Select;
-
-// const ShowData = () => {
-//     const [data, setData] = useState([]);
-//     const [riders, setRiders] = useState([]);
-//     const [filteredData, setFilteredData] = useState([]);
-//     const [selectedRider, setSelectedRider] = useState("All");
-//     const [selectedDate, setSelectedDate] = useState(null);
-//     const [loading, setLoading] = useState(true);
-//     const inputRefs = useRef([]);
-//     const [newReceiver, setNewReceiver] = useState({});
-//     const [isModalVisible, setIsModalVisible] = useState(false);
-//     const [editingRecord, setEditingRecord] = useState(null);
-//     const [form] = Form.useForm();
-
-//     useEffect(() => {
-//         setLoading(true);
-
-//         const fetchData = async () => {
-//             try {
-//                 const deliveriesQuery = query(collection(fireStore, "deliveries"));
-//                 const deliveriesSnapshot = await getDocs(deliveriesQuery);
-//                 const deliveries = deliveriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-//                 console.log("Deliveries Loaded:", deliveries);
-//                 setData(deliveries);
-//                 setFilteredData(deliveries);
-
-//                 const ridersQuery = query(collection(fireStore, "riders"));
-//                 const ridersSnapshot = await getDocs(ridersQuery);
-//                 const ridersList = ridersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-//                 console.log("Riders Loaded:", ridersList);
-//                 setRiders(ridersList);
-
-//                 setLoading(false);
-//             } catch (error) {
-//                 console.error("Error fetching data: ", error);
-//                 message.error("Failed to fetch data from Firestore!");
-//                 setLoading(false);
-//             }
-//         };
-
-//         fetchData();
-//     }, []);
-
-//     const filterData = (rider, date) => {
-//         const filtered = data.filter((item) => {
-//             const matchesRider = rider === "All" || item.riderId === rider;
-//             const matchesDate = date ? item.date === date : true;
-//             return matchesRider && matchesDate;
-//         });
-//         setFilteredData(filtered);
-//     };
-
-//     const handleRiderChange = (value) => {
-//         setSelectedRider(value);
-//         filterData(value, selectedDate);
-//     };
-
-//     const handleDateChange = (date, dateString) => {
-//         setSelectedDate(dateString);
-//         filterData(selectedRider, dateString);
-//     };
-
-//     const handleReciverChange = (e, cnNumber) => {
-//         const { value } = e.target;
-//         setNewReceiver((prev) => ({ ...prev, [cnNumber]: value }));
-//     };
-
-//     const handleKeyPress = (e, index) => {
-//         if (e.key === "Enter" && inputRefs.current[index + 1]) {
-//             inputRefs.current[index + 1].focus();
-//         }
-//     };
-
-//     const handleSaveReciver = async () => {
-//         try {
-//             const batch = writeBatch(fireStore);
-//             filteredData.forEach((item) => {
-//                 if (newReceiver[item.cnNumber]) {
-//                     const docRef = doc(fireStore, "deliveries", item.id);
-//                     batch.update(docRef, { receiverName: newReceiver[item.cnNumber] });
-//                 }
-//             });
-//             await batch.commit();
-//             message.success("Receiver names saved successfully!");
-//         } catch (error) {
-//             console.error("Error saving receiver names: ", error);
-//             message.error("Failed to save receiver names!");
-//         }
-//     };
-
-//     const handleEdit = (record) => {
-//         setEditingRecord(record);
-//         form.setFieldsValue({
-//             name: record.receiverName,
-//             date: record.date,
-//             consigneeName: record.consigneeName,
-//         });
-//         setIsModalVisible(true);
-//     };
-
-//     const handleDelete = async (record) => {
-//         try {
-//             const docRef = doc(fireStore, "deliveries", record.id);
-//             await deleteDoc(docRef);
-//             setFilteredData(filteredData.filter((item) => item.id !== record.id));
-//             const updatedRiders = riders.filter((rider) => rider.id !== record.riderId);
-//             setRiders(updatedRiders);
-//             message.success("Record deleted successfully!");
-//         } catch (error) {
-//             console.error("Error deleting record: ", error);
-//             message.error("Failed to delete record!");
-//         }
-//     };
-
-//     const handleModalOk = async () => {
-//         try {
-//             const values = await form.validateFields();
-//             const docRef = doc(fireStore, "deliveries", editingRecord.id);
-//             await updateDoc(docRef, {
-//                 receiverName: values.name,
-//                 date: values.date,
-//                 consigneeName: values.consigneeName,
-//             });
-//             setFilteredData(filteredData.map((item) =>
-//                 item.id === editingRecord.id ? { ...item, ...values } : item
-//             ));
-//             setIsModalVisible(false);
-//             message.success("Record updated successfully!");
-//         } catch (error) {
-//             console.error("Error updating record: ", error);
-//             message.error("Failed to update record!");
-//         }
-//     };
-
-//     const handleModalCancel = () => {
-//         setIsModalVisible(false);
-//     };
-
-//     const handleRiderDelete = async (riderId) => {
-//         try {
-//             const batch = writeBatch(fireStore);
-
-//             // Delete the rider
-//             const riderDocRef = doc(fireStore, "riders", riderId);
-//             batch.delete(riderDocRef);
-
-//             // Delete all deliveries associated with the rider
-//             const deliveriesQuery = query(collection(fireStore, "deliveries"), where("riderId", "==", riderId));
-//             const deliveriesSnapshot = await getDocs(deliveriesQuery);
-//             deliveriesSnapshot.forEach((doc) => {
-//                 batch.delete(doc.ref);
-//             });
-
-//             await batch.commit();
-
-//             // Update state
-//             setRiders(riders.filter((rider) => rider.id !== riderId));
-//             setFilteredData(filteredData.filter((item) => item.riderId !== riderId));
-//             setData(data.filter((item) => item.riderId !== riderId));
-
-//             message.success("Rider and associated deliveries deleted successfully!");
-//         } catch (error) {
-//             console.error("Error deleting rider and deliveries: ", error);
-//             message.error("Failed to delete rider and deliveries!");
-//         }
-//     };
-
-//     return (
-//         <main className="d-flex justify-content-center align-items-center">
-//             <Container className="m">
-//                 <Row>
-//                     <Col span={24}>
-//                         <h1>Show Data</h1>
-//                         <Card>
-//                             <Select
-//                                 name="riderName"
-//                                 className="my-2 w-100"
-//                                 value={selectedRider}
-//                                 onChange={handleRiderChange}
-//                                 dropdownRender={menu => (
-//                                     <>
-//                                         {menu}
-//                                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: 8 }}>
-//                                             <Button type="link" onClick={() => handleRiderDelete(selectedRider)} danger>
-//                                                 Delete Selected Rider
-//                                             </Button>
-//                                         </div>
-//                                     </>
-//                                 )}
-//                             >
-//                                 <Option value="All">All Riders</Option>
-//                                 {riders.map((rider) => (
-//                                     <Option key={rider.id} value={rider.id}>
-//                                         {rider.name}
-//                                     </Option>
-//                                 ))}
-//                             </Select>
-//                             <DatePicker
-//                                 onChange={handleDateChange}
-//                                 className="w-50"
-//                             />
-//                             <Button
-//                                 type="primary"
-//                                 className="mb-3"
-//                                 onClick={handleSaveReciver}
-//                             >
-//                                 Save Receiver Names
-//                             </Button>
-//                             <Table
-//                                 loading={loading}
-//                                 dataSource={filteredData}
-//                                 rowKey={(record) => record.id} // Ensure unique rowKey
-//                                 pagination={false}
-//                                 columns={[
-//                                     {
-//                                         title: "Rider Name",
-//                                         key: "riderName",
-//                                         render: (record) => {
-//                                             const rider = riders.find(
-//                                                 (r) => r.id === record.riderId
-//                                             );
-//                                             return rider?.name || "Unknown";
-//                                         },
-//                                     },
-//                                     {
-//                                         title: "CN Number",
-//                                         dataIndex: "cnNumber",
-//                                         key: "cnNumber",
-//                                     },
-//                                     {
-//                                         title: "Consignee Name",
-//                                         dataIndex: "consigneeName",
-//                                         key: "consigneeName",
-//                                     },
-//                                     {
-//                                         title: "Receiver Name",
-//                                         key: "receiverName",
-//                                         render: (record, _, index) => (
-//                                             <Input
-//                                                 defaultValue={record.receiverName}
-//                                                 ref={(ref) =>
-//                                                     (inputRefs.current[index] = ref)
-//                                                 }
-//                                                 onChange={(e) =>
-//                                                     handleReciverChange(e, record.cnNumber)
-//                                                 }
-//                                                 onKeyDown={(e) => handleKeyPress(e, index)}
-//                                             />
-//                                         ),
-//                                     },
-//                                     {
-//                                         title: "Date",
-//                                         dataIndex: "date",
-//                                         key: "date",
-//                                     },
-//                                     {
-//                                         title: "Actions",
-//                                         key: "actions",
-//                                         render: (record) => (
-//                                             <div>
-//                                                 <Button
-//                                                     type="link"
-//                                                     onClick={() => handleEdit(record)}
-//                                                 >
-//                                                     Edit
-//                                                 </Button>
-//                                                 <Button
-//                                                     type="link"
-//                                                     danger
-//                                                     onClick={() => handleDelete(record)}
-//                                                 >
-//                                                     Delete
-//                                                 </Button>
-//                                             </div>
-//                                         ),
-//                                     },
-//                                 ]}
-//                             />
-//                         </Card>
-//                     </Col>
-//                 </Row>
-//             </Container>
-//             <Modal
-//                 title="Edit Record"
-//                 visible={isModalVisible}
-//                 onOk={handleModalOk}
-//                 onCancel={handleModalCancel}
-//             >
-//                 <Form form={form} layout="vertical">
-//                     <Form.Item
-//                         name="name"
-//                         label="Receiver Name"
-//                         rules={[{ required: true, message: 'Please input the receiver name!' }]}
-//                     >
-//                         <Input />
-//                     </Form.Item>
-//                     <Form.Item
-//                         name="date"
-//                         label="Date"
-//                         rules={[{ required: true, message: 'Please input the date!' }]}
-//                     >
-//                         <Input />
-//                     </Form.Item>
-//                     <Form.Item
-//                         name="consigneeName"
-//                         label="Consignee Name"
-//                         rules={[{ required: true, message: 'Please input the consignee name!' }]}
-//                     >
-//                         <Input />
-//                     </Form.Item>
-//                 </Form>
-//             </Modal>
-//         </main>
-//     );
-// };
-
-// export default ShowData;
-
-import { Table, Card, Select, DatePicker, Row, Col, Button, Input, message, Modal, Form } from "antd";
-import React, { useState, useEffect, useRef } from "react";
-import { Container } from "react-bootstrap";
-import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
-import { collection, getDocs, query, writeBatch, doc, deleteDoc, updateDoc, where } from "firebase/firestore";
-import { useAuthContext } from "../../Context/Auth";
+import React, { useEffect, useRef, useState } from "react";
+import { Table, Select, DatePicker, Button, Modal, Input, message, Form, Row, Col, Card, Typography, Popconfirm } from "antd";
+import { collection, getDocs, deleteDoc, doc, updateDoc, writeBatch, query, orderBy } from "firebase/firestore";
+import { fireStore } from "../../Config/firebase";
 import { DeleteFilled, EditFilled } from "@ant-design/icons";
+import { Container } from "react-bootstrap";
 
 const { Option } = Select;
 
 const ShowData = () => {
-    const { user } = useAuthContext();
+    const { Title } = Typography;
     const [data, setData] = useState([]);
-    const [riders, setRiders] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
-    const [selectedRider, setSelectedRider] = useState("All");
-    const [selectedDate, setSelectedDate] = useState(null);
     const [loading, setLoading] = useState(true);
-    const inputRefs = useRef([]);
+    const [riderList, setRiderList] = useState([]);
+    const [riders, setRiders] = useState([]);
     const [newReceiver, setNewReceiver] = useState({});
+    const [selectedRider, setSelectedRider] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [page, setPage] = useState(1);
+    const [searchValue, setSearchValue] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [editingRecord, setEditingRecord] = useState(null);
+    const [editRecord, setEditRecord] = useState(null);
+    const [editingRecord, setEditingRecord] = useState(null)
     const [form] = Form.useForm();
+    const [editedValues, setEditedValues] = useState({});
+    const inputRefs = useRef([]);
 
     useEffect(() => {
-        setLoading(true);
-
-        const fetchData = async () => {
-            try {
-                const deliveriesQuery = query(collection(fireStore, "deliveries"));
-                const deliveriesSnapshot = await getDocs(deliveriesQuery);
-                const deliveries = deliveriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log("Deliveries Loaded:", deliveries);
-                setData(deliveries);
-                setFilteredData(deliveries);
-                const ridersQuery = query(collection(fireStore, "riders"));
-                const ridersSnapshot = await getDocs(ridersQuery);
-                const ridersList = ridersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log("Riders Loaded:", ridersList);
-                setRiders(ridersList);
-                setLoading(false);
-            } catch (error) {
-                message.error("Failed to fetch data from Firestore!");
-                setLoading(false);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+        fetchDeliveries();
     }, []);
-    const filterData = (rider, date) => {
-        const filtered = data.filter((item) => {
-            const matchesRider = rider === "All" || item.riderId === rider;
-            const matchesDate = date ? item.date === date : true;
-            return matchesRider && matchesDate;
-        });
+    const fetchDeliveries = async () => {
+        setLoading(true);
+        try {
+            // const queryData = query(collection(fireStore, "deliveries"))
+            const queryData = query(collection(fireStore, "deliveries"), orderBy('createdAt'))
+            const querySnapshot = await getDocs(queryData);
+            const deliveryList = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+
+            setData(deliveryList);
+            setFilteredData(deliveryList);
+            const uniqueRiders = [];
+            const riderMap = new Map();
+            deliveryList.forEach(delivery => {
+                if (delivery.riderId && !riderMap.has(delivery.riderId)) {
+                    riderMap.set(delivery.riderId, { id: delivery.riderId, name: delivery.riderName || "Unknown" });
+                }
+            });
+            uniqueRiders.push(...riderMap.values());
+            setRiderList(uniqueRiders);
+        } catch (error) {
+            console.error("Error fetching deliveries:", error);
+        }
+        setLoading(false);
+    };
+    const applyFilters = () => {
+        let filtered = [...data];
+        if (selectedRider) {
+            filtered = filtered.filter(delivery => delivery.riderId === selectedRider);
+        }
+        if (selectedDate) {
+            const selectedDateString = selectedDate.format("YYYY-MM-DD");
+            filtered = filtered.filter(delivery => delivery.date === selectedDateString);
+        }
         setFilteredData(filtered);
     };
-    const handleRiderChange = (value) => { setSelectedRider(value); filterData(value, selectedDate) };
-    const handleDateChange = (date, dateString) => { setSelectedDate(dateString); filterData(selectedRider, dateString) };
+    const handleEdit = (record) => {
+        setEditingRecord(record);
+        form.setFieldsValue({
+            name: record.receiverName,
+            date: record.date,
+            consigneeName: record.consigneeName
+        }); // Form fields ko update karein
+        setIsModalVisible(true);
+    };
+
+
+    // const handleDelete = async (id) => {
+    //     await deleteDoc(doc(fireStore, "deliveries", id));
+    //     fetchDeliveries();
+    // };
+
+    const handleDelete = async (id) => {
+        try {
+            await deleteDoc(doc(fireStore, "deliveries", id));
+
+            // Remove deleted item from state instead of refetching
+            setData(prevData => prevData.filter(item => item.id !== id));
+            setFilteredData(prevFiltered => prevFiltered.filter(item => item.id !== id));
+
+            message.success("Delivery deleted successfully!");
+        } catch (error) {
+            console.error("Error deleting delivery:", error);
+            message.error("Failed to delete delivery!");
+        }
+    };
+
+    const handleKeyPress = (e, index) => {
+        if (e.key === "Enter") {
+            inputRefs.current[index]?.blur(); // Remove focus
+        }
+    };
     const handleReciverChange = (e, cnNumber) => { const { value } = e.target; setNewReceiver((prev) => ({ ...prev, [cnNumber]: value })) };
-    const handleKeyPress = (e, index) => { if (e.key === "Enter" && inputRefs.current[index + 1]) { inputRefs.current[index + 1].focus() } };
+
+    // const handleSaveReciver = async () => {
+    //     try {
+    //         const batch = writeBatch(fireStore);
+    //         filteredData.forEach((item) => {
+    //             if (newReceiver[item.cnNumber]) {
+    //                 const docRef = doc(fireStore, "deliveries", item.id);
+    //                 batch.update(docRef, { receiverName: newReceiver[item.cnNumber] });
+    //             }
+    //         });
+    //         await batch.commit();
+    //         message.success("Receiver names saved successfully!");
+    //     } catch (error) {
+    //         console.error("Error saving receiver names: ", error);
+    //         message.error("Failed to save receiver names!");
+    //     }
+    // };
+    //    
     const handleSaveReciver = async () => {
         try {
             const batch = writeBatch(fireStore);
@@ -401,40 +138,30 @@ const ShowData = () => {
             message.error("Failed to save receiver names!");
         }
     };
-    const handleEdit = (record) => {
-        setEditingRecord(record);
-        form.setFieldsValue({
-            name: record.receiverName,
-            date: record.date,
-            consigneeName: record.consigneeName,
-        });
-        setIsModalVisible(true);
-    };
-    const handleDelete = async (record) => {
-        try {
-            const docRef = doc(fireStore, "deliveries", record.id);
-            await deleteDoc(docRef);
-            setFilteredData(filteredData.filter((item) => item.id !== record.id));
-            const updatedRiders = riders.filter((rider) => rider.id !== record.riderId);
-            setRiders(updatedRiders);
-            message.success("Record deleted successfully!");
-        } catch (error) {
-            console.error("Error deleting record: ", error);
-            message.error("Failed to delete record!");
+
+    const handleSave = async () => {
+        if (editRecord) {
+            await updateDoc(doc(fireStore, "deliveries", editRecord.id), editedValues);
+            fetchDeliveries();
+            setIsModalVisible(false);
         }
     };
+
+
     const handleModalOk = async () => {
         try {
             const values = await form.validateFields();
+            if (!editingRecord) return; // Ensure there's a record to update
+
             const docRef = doc(fireStore, "deliveries", editingRecord.id);
             await updateDoc(docRef, {
                 receiverName: values.name,
                 date: values.date,
                 consigneeName: values.consigneeName,
             });
-            setFilteredData(filteredData.map((item) =>
-                item.id === editingRecord.id ? { ...item, ...values } : item
-            ));
+
+            await fetchDeliveries(); // Fresh data reload karein
+
             setIsModalVisible(false);
             message.success("Record updated successfully!");
         } catch (error) {
@@ -443,536 +170,223 @@ const ShowData = () => {
         }
     };
 
-    const handleModalCancel = () => { setIsModalVisible(false) };
-    const handleRiderDelete = async (riderId) => {
-        try {
-            const batch = writeBatch(fireStore);
 
-            // Delete the rider
-            const riderDocRef = doc(fireStore, "riders", riderId);
-            batch.delete(riderDocRef);
+    // Open Modal with Data
+    // const handleEdit = (record) => {
+    //     setEditingRecord(record);
+    //     form.setFieldsValue(record); // Populate form fields
+    //     setIsModalVisible(true);
+    // };
 
-            // Delete all deliveries associated with the rider
-            const deliveriesQuery = query(collection(fireStore, "deliveries"), where("riderId", "==", user.Id));
-            const deliveriesSnapshot = await getDocs(deliveriesQuery);
-            deliveriesSnapshot.forEach((doc) => {
-                batch.delete(doc.ref);
-            });
 
-            await batch.commit();
+    const onSearch = (value) => {
+        let filtered = [...data];
 
-            // Update state
-            setRiders(riders.filter((rider) => rider.id !== riderId));
-            setFilteredData(filteredData.filter((item) => item.riderId !== riderId));
-            setData(data.filter((item) => item.riderId !== riderId));
+        if (value) {
+            filtered = filtered.filter((delivery) =>
+                delivery.cnNumber?.toString().toLowerCase().includes(value.toLowerCase())
+            );
+        }
 
-            message.success("Rider and associated deliveries deleted successfully!");
-        } catch (error) {
-            console.error("Error deleting rider and deliveries: ", error);
-            message.error("Failed to delete rider and deliveries!");
+        setFilteredData(filtered);
+    };
+
+    const handleSearchClick = () => {
+        let filtered = [...data];
+        if (searchValue) {
+            filtered = filtered.filter((delivery) =>
+                delivery.cnNumber?.toString().toLowerCase().includes(searchValue.toLowerCase())
+            );
+            setFilteredData(filtered);
+        }
+        else {
+            setFilteredData(data); // Reset to show all data if searchValue is empty
+        }
+    };
+    // const handleClearSearch = () => {
+    //     setSearchValue('');
+    //     setFilteredData(data); // Reset to original data
+    // };
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearchValue(value);
+
+        // If the search input is cleared, reset filteredData to show all data
+        if (!value) {
+            setFilteredData(data);
         }
     };
 
+    const handleModalCancel = () => { setIsModalVisible(false) };
+    const columns = [
+        {
+            title: "#",
+            key: "index",
+            render: (_, __, index) => index + 1,
+        },
+        {
+            title: "Rider Name",
+            key: "riderName",
+            render: (record) => {
+                const rider = riderList.find((r) => r.id === record.riderId);
+                return rider ? rider.name : "Unknown";
+            },
+        },
+        {
+            title: "CN Number",
+            dataIndex: "cnNumber",
+            key: "cnNumber",
+        },
+        {
+            title: "Consignee Name",
+            dataIndex: "consigneeName",
+            key: "consigneeName",
+        },
+        {
+            title: "Receiver Name",
+            key: "receiverName",
+            render: (record, _, index) => (
+                <Input
+                    className="border-0"
+                    defaultValue={record.receiverName}
+                    ref={(ref) => (inputRefs.current[index] = ref)}
+                    onChange={(e) => handleReciverChange(e, record.cnNumber)}
+                    onKeyDown={(e) => handleKeyPress(e, index)}
+                />
+            ),
+        },
+        {
+            title: "Date",
+            dataIndex: "date",
+            key: "date",
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (_, record) => (
+                <>
+                    <Button className="bg-success text-light" onClick={() => handleEdit(record)}>
+                        <EditFilled />
+                    </Button>
+                    <Popconfirm
+                        title="Are you sure you want to delete this rider?"
+                        onConfirm={() => handleDelete(record.id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button className="bg-danger  text-light" danger>
+                            <DeleteFilled />
+                        </Button>
+                    </Popconfirm>
+                </>
+            ),
+        },
+    ];
+
     return (
-        <main className=" auth d-flex justify-content-center align-items-center">
-            <Container className="mt-5">
+        <main className="auth">
+            <Container className="my-3" >
                 <Row>
-                    <Col span={24}>
-                        <Card style={{backgroundColor:"#d6d6d6"}} >
-                        <h1>Show Data</h1>
-                            <Select name="riderName" className="my-2 w-100" value={selectedRider} onChange={handleRiderChange}
-                                dropdownRender={menu => (
-                                    <>
-                                        {menu}
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: 8 }}>
-                                            <Button type="link" onClick={() => handleRiderDelete(selectedRider)} danger>
-                                                Delete Selected Rider
-                                            </Button>
-                                        </div>
-                                    </>
-                                )}
-                            >
-                                <Option value="All">All Riders</Option>
-                                {riders.map((rider) => (
-                                    <Option key={rider.id} value={rider.id}>
-                                        {rider.name}
-                                    </Option>
-                                ))}
-                            </Select>
-                            <DatePicker onChange={handleDateChange} className="w-50" />
-                            <Button type="primary" className="mb-3" onClick={handleSaveReciver}                            >
-                                Save Receiver Names
-                            </Button>
-                            {/* <Table loading={loading} dataSource={filteredData} rowKey={(record) => record.id} pagination={{pageSize: 20}}
-                                columns={[{
-                                    title: "Rider Name",
-                                    key: "riderName", theme: 'grid',
-                                    render: (record) => {
-                                        const rider = riders.find(
-                                            (r) => r.id === record.riderId
-                                        );
-                                        return rider?.name || "Unknown";
-                                    },
-                                },
-                                {
-                                    title: "CN Number",
-                                    dataIndex: "cnNumber",
-                                    key: "cnNumber",
-                                },
-                                {
-                                    title: "Consignee Name",
-                                    dataIndex: "consigneeName",
-                                    key: "consigneeName",
-                                },
-                                {
-                                    title: "Receiver Name",
-                                    key: "receiverName",
-                                    render: (record, _, index) => (
-                                        <Input className="border-0" defaultValue={record.receiverName}
-                                            ref={(ref) =>
-                                                (inputRefs.current[index] = ref)
+                    <Col span={24} className="mt-5">
+                        <Title level={1} className="text-light"> Show Data</Title>
+                        <Card className="border-1 mt-5 border-black">
+                            <Card className="border-0">
+                                <Row>
+                                    <Col span={12}>
+                                        {/* <Select
+                                            placeholder="Select Rider"
+                                            onChange={(value) => setSelectedRider(value)}
+                                            showSearch
+                                            // placeholder="Search Rider..."
+                                            filterOption={(input, option) =>
+                                                option && option.label && option.label.toLowerCase().includes(input.toLowerCase())
                                             }
-                                            onChange={(e) =>
-                                                handleReciverChange(e, record.cnNumber)
+                                            allowClear
+                                            className="w-75 ">
+                                            <Option key="all" value={null}>
+                                                All Riders
+                                            </Option>
+                                            {riderList.map((rider) => (
+                                                <Option key={rider.id} value={rider.id}>
+                                                    {rider.name}
+                                                </Option>
+                                            ))}
+                                        </Select> */}
+                                        <Select
+                                            placeholder="Select Rider"
+                                            onChange={(value) => setSelectedRider(value)}
+                                            showSearch
+                                            optionFilterProp="label"
+                                            filterOption={(input, option) =>
+                                                option?.label?.toLowerCase().includes(input.toLowerCase())
                                             }
-                                            onKeyDown={(e) => handleKeyPress(e, index)}
+                                            allowClear
+                                            className="w-75"
+                                            options={[
+                                                { value: null, label: "All Riders" },
+                                                ...riderList.map(rider => ({ value: rider.id, label: rider.name }))
+                                            ]}
                                         />
-                                    ),
-                                },
-                                {
-                                    title: "Date",
-                                    dataIndex: "date",
-                                    key: "date",
-                                },
-                                {
-                                    title: "Actions",
-                                    key: "actions",
-                                    render: (record) => (
-                                        <div>
-                                            <Button onClick={() => handleEdit(record)}>
-                                                <EditFilled />
-                                            </Button>
-                                            <Button danger onClick={() => handleDelete(record)}>
-                                                <DeleteFilled />
-                                            </Button>
-                                        </div>
-                                    ),
-                                },
-                                ]}
-                            /> */}
-                            <Table
+
+                                    </Col>
+                                    <Col span={12}>
+                                        <DatePicker className="border-1 w-75 border-black"
+                                            placeholder="Select Date"
+                                            onChange={setSelectedDate}
+                                        />
+                                        <Button className="ms-2 bg-black text-light" onClick={applyFilters}>Apply Filters</Button>
+                                    </Col>
+                                    <Col span={12} className="mt-3">
+                                        <Input className="border-1 w-75 border-black"
+                                            placeholder="Enter CN Number"
+                                            value={searchValue}
+                                            onChange={handleSearchChange} // Handle the change in the input
+                                            allowClear
+                                        />
+                                        <Button type="primary" className="ms-2" onClick={handleSearchClick}>
+                                            Search
+                                        </Button>
+                                    </Col>
+                                    <Col span={12} className="mt-3">
+                                        <Button className=" bg-success text-light ms-2" onClick={handleSaveReciver}>
+                                            Save Receiver Names
+                                        </Button>
+                                    </Col>
+                                </Row>
+                            </Card>
+                            <Table bordered className="border-black border-1  "
+                                dataSource={filteredData.map((item, index) => ({ ...item, key: item.id || index }))}
+                                columns={columns}
                                 loading={loading}
-                                dataSource={filteredData}
-                                rowKey={(record) => record.id}
-                                pagination={{ pageSize: 20 }}
-                                columns={[
-                                    {
-                                        title: "#",  // Column Title
-                                        key: "index",
-                                        render: (_, __, index) => index + 1, // Displaying Row Index
-                                    },
-                                    {
-                                        title: "Rider Name",
-                                        key: "riderName",
-                                        theme: 'grid',
-                                        render: (record) => {
-                                            const rider = riders.find((r) => r.id === record.riderId);
-                                            return rider?.name || "Unknown";
-                                        },
-                                    },
-                                    {
-                                        title: "CN Number",
-                                        dataIndex: "cnNumber",
-                                        key: "cnNumber",
-                                    },
-                                    {
-                                        title: "Consignee Name",
-                                        dataIndex: "consigneeName",
-                                        key: "consigneeName",
-                                    },
-                                    {
-                                        title: "Receiver Name",
-                                        key: "receiverName",
-                                        render: (record, _, index) => (
-                                            <Input
-                                                className="border-0"
-                                                defaultValue={record.receiverName}
-                                                ref={(ref) => (inputRefs.current[index] = ref)}
-                                                onChange={(e) => handleReciverChange(e, record.cnNumber)}
-                                                onKeyDown={(e) => handleKeyPress(e, index)}
-                                            />
-                                        ),
-                                    },
-                                    {
-                                        title: "Date",
-                                        dataIndex: "date",
-                                        key: "date",
-                                    },
-                                    {
-                                        title: "Actions",
-                                        key: "actions",
-                                        render: (record) => (
-                                            <div>
-                                                <Button onClick={() => handleEdit(record)}>
-                                                    <EditFilled />
-                                                </Button>
-                                                <Button danger onClick={() => handleDelete(record)}>
-                                                    <DeleteFilled />
-                                                </Button>
-                                            </div>
-                                        ),
-                                    },
-                                ]}
+                                pagination={{
+                                    current: page,
+                                    pageSize: 20,
+                                    showSizeChanger: false,
+                                    onChange: (newPage) => setPage(newPage),
+                                }}
                             />
+
+                            <Modal title="Edit Record" visible={isModalVisible} onOk={handleModalOk} onCancel={handleModalCancel}>
+                                <Form form={form} layout="vertical">
+                                    <Form.Item name="name" label="Receiver Name" rules={[{ required: true, message: 'Please input the receiver name!' }]}>
+                                        <Input />
+                                    </Form.Item>
+                                    <Form.Item name="date" label="Date" rules={[{ required: true, message: 'Please input the date!' }]}>
+                                        <Input />
+                                    </Form.Item>
+                                    <Form.Item name="consigneeName" label="Consignee Name" rules={[{ required: true, message: 'Please input the consignee name!' }]}>
+                                        <Input />
+                                    </Form.Item>
+                                </Form>
+                            </Modal>
 
                         </Card>
                     </Col>
                 </Row>
             </Container>
-            <Modal title="Edit Record" visible={isModalVisible} onOk={handleModalOk} onCancel={handleModalCancel}>
-                <Form form={form} layout="vertical">
-                    <Form.Item name="name" label="Receiver Name" rules={[{ required: true, message: 'Please input the receiver name!' }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="date" label="Date" rules={[{ required: true, message: 'Please input the date!' }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="consigneeName" label="Consignee Name" rules={[{ required: true, message: 'Please input the consignee name!' }]}>
-                        <Input />
-                    </Form.Item>
-                </Form>
-            </Modal>
+
         </main>
     );
 };
 
 export default ShowData;
-
-
-
-// import { Table, Card, Select, DatePicker, Row, Col, Button, Input, message, Modal, Form } from "antd";
-// import React, { useState, useEffect, useRef } from "react";
-// import { Container } from "react-bootstrap";
-// import { fireStore } from "../../Config/firebase"; // Adjust the import path as needed
-// import { collection, getDocs, query, writeBatch, doc, deleteDoc, updateDoc, where } from "firebase/firestore";
-// import { useAuthContext } from "../../Context/Auth";
-
-// const { Option } = Select;
-
-// const ShowData = () => {
-//      const { user} = useAuthContext();
-//     const [data, setData] = useState([]);
-//     const [riders, setRiders] = useState([]);
-//     const [filteredData, setFilteredData] = useState([]);
-//     const [selectedRider, setSelectedRider] = useState("All");
-//     const [selectedDate, setSelectedDate] = useState(null);
-//     const [loading, setLoading] = useState(true);
-//     const inputRefs = useRef([]);
-//     const [newReceiver, setNewReceiver] = useState({});
-//     const [isModalVisible, setIsModalVisible] = useState(false);
-//     const [editingRecord, setEditingRecord] = useState(null);
-//     const [form] = Form.useForm();
-
-//     useEffect(() => {
-//         setLoading(true);
-
-//         const fetchData = async () => {
-//             try {
-//                 const deliveriesQuery = query(collection(fireStore, "deliveries"));
-//                 const deliveriesSnapshot = await getDocs(deliveriesQuery);
-//                 const deliveries = deliveriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-//                 console.log("Deliveries Loaded:", deliveries);
-//                 setData(deliveries);
-//                 setFilteredData(deliveries);
-
-//                 const ridersQuery = query(collection(fireStore, "riders") );
-//                 const ridersSnapshot = await getDocs(ridersQuery);
-//                 const ridersList = ridersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-//                 console.log("Riders Loaded:", ridersList);
-//                 setRiders(ridersList);
-
-//                 setLoading(false);
-//             } catch (error) {
-//                 console.error("Error fetching data: ", error);
-//                 message.error("Failed to fetch data from Firestore!");
-//                 setLoading(false);
-//             }
-//         };
-
-//         fetchData();
-//     }, []);
-
-//     const filterData = (rider, date) => {
-//         const filtered = data.filter((item) => {
-//             const matchesRider = rider === "All" || item.riderId === rider;
-//             const matchesDate = date ? item.date === date : true;
-//             return matchesRider && matchesDate;
-//         });
-//         setFilteredData(filtered);
-//     };
-
-//     const handleRiderChange = (value) => {
-//         setSelectedRider(value);
-//         filterData(value, selectedDate);
-//     };
-
-//     const handleDateChange = (date, dateString) => {
-//         setSelectedDate(dateString);
-//         filterData(selectedRider, dateString);
-//     };
-
-//     const handleReciverChange = (e, cnNumber) => {
-//         const { value } = e.target;
-//         setNewReceiver((prev) => ({ ...prev, [cnNumber]: value }));
-//     };
-
-//     const handleKeyPress = (e, index) => {
-//         if (e.key === "Enter" && inputRefs.current[index + 1]) {
-//             inputRefs.current[index + 1].focus();
-//         }
-//     };
-
-//     const handleSaveReciver = async () => {
-//         try {
-//             const batch = writeBatch(fireStore);
-//             filteredData.forEach((item) => {
-//                 if (newReceiver[item.cnNumber]) {
-//                     const docRef = doc(fireStore, "deliveries", item.id);
-//                     batch.update(docRef, { receiverName: newReceiver[item.cnNumber] });
-//                 }
-//             });
-//             await batch.commit();
-//             message.success("Receiver names saved successfully!");
-//         } catch (error) {
-//             console.error("Error saving receiver names: ", error);
-//             message.error("Failed to save receiver names!");
-//         }
-//     };
-
-//     const handleEdit = (record) => {
-//         setEditingRecord(record);
-//         form.setFieldsValue({
-//             name: record.receiverName,
-//             date: record.date,
-//             consigneeName: record.consigneeName,
-//         });
-//         setIsModalVisible(true);
-//     };
-
-//     const handleDelete = async (record) => {
-//         try {
-//             const docRef = doc(fireStore, "deliveries", record.id);
-//             await deleteDoc(docRef);
-//             setFilteredData(filteredData.filter((item) => item.id !== record.id));
-//             const updatedRiders = riders.filter((rider) => rider.id !== record.riderId);
-//             setRiders(updatedRiders);
-//             message.success("Record deleted successfully!");
-//         } catch (error) {
-//             console.error("Error deleting record: ", error);
-//             message.error("Failed to delete record!");
-//         }
-//     };
-
-//     const handleModalOk = async () => {
-//         try {
-//             const values = await form.validateFields();
-//             const docRef = doc(fireStore, "deliveries", editingRecord.id);
-//             await updateDoc(docRef, {
-//                 receiverName: values.name,
-//                 date: values.date,
-//                 consigneeName: values.consigneeName,
-//             });
-//             setFilteredData(filteredData.map((item) =>
-//                 item.id === editingRecord.id ? { ...item, ...values } : item
-//             ));
-//             setIsModalVisible(false);
-//             message.success("Record updated successfully!");
-//         } catch (error) {
-//             console.error("Error updating record: ", error);
-//             message.error("Failed to update record!");
-//         }
-//     };
-
-//     const handleModalCancel = () => {
-//         setIsModalVisible(false);
-//     };
-
-//     const handleRiderDelete = async (riderId) => {
-//         try {
-//             const batch = writeBatch(fireStore);
-
-//             // Delete the rider
-//             const riderDocRef = doc(fireStore, "riders", riderId);
-//             batch.delete(riderDocRef);
-
-//             // Delete all deliveries associated with the rider
-//             const deliveriesQuery = query(collection(fireStore, "deliveries"), where("riderId", "==", user.Id));
-//             const deliveriesSnapshot = await getDocs(deliveriesQuery);
-//             deliveriesSnapshot.forEach((doc) => {
-//                 batch.delete(doc.ref);
-//             });
-
-//             await batch.commit();
-
-//             // Update state
-//             setRiders(riders.filter((rider) => rider.id !== riderId));
-//             setFilteredData(filteredData.filter((item) => item.riderId !== riderId));
-//             setData(data.filter((item) => item.riderId !== riderId));
-
-//             message.success("Rider and associated deliveries deleted successfully!");
-//         } catch (error) {
-//             console.error("Error deleting rider and deliveries: ", error);
-//             message.error("Failed to delete rider and deliveries!");
-//         }
-//     };
-
-//     return (
-//         <main className="d-flex justify-content-center align-items-center">
-//             <Container className="m">
-//                 <Row>
-//                     <Col span={24}>
-//                         <h1>Show Data</h1>
-//                         <Card>
-//                             <Select
-//                                 name="riderName"
-//                                 className="my-2 w-100"
-//                                 value={selectedRider}
-//                                 onChange={handleRiderChange}
-//                                 dropdownRender={menu => (
-//                                     <>
-//                                         {menu}
-//                                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: 8 }}>
-//                                             <Button type="link" onClick={() => handleRiderDelete(selectedRider)} danger>
-//                                                 Delete Selected Rider
-//                                             </Button>
-//                                         </div>
-//                                     </>
-//                                 )}
-//                             >
-//                                 <Option value="All">All Riders</Option>
-//                                 {riders.map((rider) => (
-//                                     <Option key={rider.id} value={rider.id}>
-//                                         {rider.name}
-//                                     </Option>
-//                                 ))}
-//                             </Select>
-//                             <DatePicker
-//                                 onChange={handleDateChange}
-//                                 className="w-50"
-//                             />
-//                             <Button
-//                                 type="primary"
-//                                 className="mb-3"
-//                                 onClick={handleSaveReciver}
-//                             >
-//                                 Save Receiver Names
-//                             </Button>
-//                             <Table
-//                                 loading={loading}
-//                                 dataSource={filteredData}
-//                                 rowKey={(record) => record.id} // Ensure unique rowKey
-//                                 pagination={false}
-//                                 columns={[
-//                                     {
-//                                         title: "Rider Name",
-//                                         key: "riderName",
-//                                         render: (record) => {
-//                                             const rider = riders.find(
-//                                                 (r) => r.id === record.riderId
-//                                             );
-//                                             return rider?.name || "Unknown";
-//                                         },
-//                                     },
-//                                     {
-//                                         title: "CN Number",
-//                                         dataIndex: "cnNumber",
-//                                         key: "cnNumber",
-//                                     },
-//                                     {
-//                                         title: "Consignee Name",
-//                                         dataIndex: "consigneeName",
-//                                         key: "consigneeName",
-//                                     },
-//                                     {
-//                                         title: "Receiver Name",
-//                                         key: "receiverName",
-//                                         render: (record, _, index) => (
-//                                             <Input
-//                                                 defaultValue={record.receiverName}
-//                                                 ref={(ref) =>
-//                                                     (inputRefs.current[index] = ref)
-//                                                 }
-//                                                 onChange={(e) =>
-//                                                     handleReciverChange(e, record.cnNumber)
-//                                                 }
-//                                                 onKeyDown={(e) => handleKeyPress(e, index)}
-//                                             />
-//                                         ),
-//                                     },
-//                                     {
-//                                         title: "Date",
-//                                         dataIndex: "date",
-//                                         key: "date",
-//                                     },
-//                                     {
-//                                         title: "Actions",
-//                                         key: "actions",
-//                                         render: (record) => (
-//                                             <div>
-//                                                 <Button
-//                                                     type="link"
-//                                                     onClick={() => handleEdit(record)}
-//                                                 >
-//                                                     Edit
-//                                                 </Button>
-//                                                 <Button
-//                                                     type="link"
-//                                                     danger
-//                                                     onClick={() => handleDelete(record)}
-//                                                 >
-//                                                     Delete
-//                                                 </Button>
-//                                             </div>
-//                                         ),
-//                                     },
-//                                 ]}
-//                             />
-//                         </Card>
-//                     </Col>
-//                 </Row>
-//             </Container>
-//             <Modal
-//                 title="Edit Record"
-//                 visible={isModalVisible}
-//                 onOk={handleModalOk}
-//                 onCancel={handleModalCancel}
-//             >
-//                 <Form form={form} layout="vertical">
-//                     <Form.Item
-//                         name="name"
-//                         label="Receiver Name"
-//                         rules={[{ required: true, message: 'Please input the receiver name!' }]}
-//                     >
-//                         <Input />
-//                     </Form.Item>
-//                     <Form.Item
-//                         name="date"
-//                         label="Date"
-//                         rules={[{ required: true, message: 'Please input the date!' }]}
-//                     >
-//                         <Input />
-//                     </Form.Item>
-//                     <Form.Item
-//                         name="consigneeName"
-//                         label="Consignee Name"
-//                         rules={[{ required: true, message: 'Please input the consignee name!' }]}
-//                     >
-//                         <Input />
-//                     </Form.Item>
-//                 </Form>
-//             </Modal>
-//         </main>
-//     );
-// };
-
-// export default ShowData; 
