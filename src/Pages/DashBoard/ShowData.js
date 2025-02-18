@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Table, Select, DatePicker, Button, Modal, Input, message, Form, Row, Col, Card, Typography, Popconfirm } from "antd";
-import { collection, getDocs, deleteDoc, doc, updateDoc, writeBatch, query} from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, updateDoc, writeBatch, getDoc, query, orderBy } from "firebase/firestore";
 import { fireStore } from "../../Config/firebase";
 import { DeleteFilled, EditFilled } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
@@ -13,49 +13,83 @@ const ShowData = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [riderList, setRiderList] = useState([]);
-    const [riders, setRiders] = useState([]);
+    // const [riders, setRiders] = useState([]);
     const [newReceiver, setNewReceiver] = useState({});
     const [selectedRider, setSelectedRider] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
     const [page, setPage] = useState(1);
     const [searchValue, setSearchValue] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [editRecord, setEditRecord] = useState(null);
+    // const [editRecord, setEditRecord] = useState(null);
     const [editingRecord, setEditingRecord] = useState(null)
     const [form] = Form.useForm();
-    const [editedValues, setEditedValues] = useState({});
+    // const [editedValues, setEditedValues] = useState({});
     const inputRefs = useRef([]);
 
     useEffect(() => {
         fetchDeliveries();
     }, []);
+
     const fetchDeliveries = async () => {
         setLoading(true);
         try {
-            const queryData = query(collection(fireStore, "deliveries"))
-            // const queryData = query(collection(fireStore, "deliveries"), orderBy('createdAt'))
-            const querySnapshot = await getDocs(queryData);
+            // ✅ Correcting Firestore query with orderBy
+            const deliveryQuery = query(collection(fireStore, "deliveries"), orderBy("createdAt"));
+            // const deliveryQuery = query(collection(fireStore, "deliveries"))
+            const querySnapshot = await getDocs(deliveryQuery);
             const deliveryList = querySnapshot.docs.map(doc => ({
                 id: doc.id,
-                ...doc.data(),
+                source: "deliveries",
+                createdAt: doc.data().createdAt || "", // Avoids undefined issues
+                ...doc.data()
             }));
 
-            setData(deliveryList);
-            setFilteredData(deliveryList);
-            const uniqueRiders = [];
-            const riderMap = new Map();
-            deliveryList.forEach(delivery => {
-                if (delivery.riderId && !riderMap.has(delivery.riderId)) {
-                    riderMap.set(delivery.riderId, { id: delivery.riderId, name: delivery.riderName || "Unknown" });
-                }
-            });
-            uniqueRiders.push(...riderMap.values());
-            setRiderList(uniqueRiders);
+            // ✅ Fetch riders collection
+            const riderQuerySnapshot = await getDocs(collection(fireStore, "riders"));
+            const riders = riderQuerySnapshot.docs.map(doc => ({
+                id: doc.id,
+                name: doc.data().name || "Unknown" // Ensures no undefined values
+            }));
+
+            // ✅ Fetch shipper collection
+            const shipperSnapshot = await getDocs(collection(fireStore, "shipper"));
+            const shipperList = shipperSnapshot.docs.map(doc => ({
+                id: doc.id,
+                source: "shipper",
+                ...doc.data()
+            }));
+
+            // ✅ Create a map for fast lookup of riders
+            const riderMap = new Map(riders.map(rider => [rider.id, rider.name]));
+
+            // ✅ Assign rider names to deliveries
+            const updatedDeliveries = deliveryList.map(delivery => ({
+                ...delivery,
+                riderName: riderMap.get(delivery.riderId) || "Unknown"
+            }));
+
+            // ✅ Combine deliveries & shippers
+            const combinedData = [...updatedDeliveries, ...shipperList];
+
+            // ✅ Efficient state updates
+            setData(combinedData);
+            setFilteredData(combinedData);
+            setRiderList(riders);
         } catch (error) {
             console.error("Error fetching deliveries:", error);
         }
         setLoading(false);
     };
+
+    // ✅ Fetch deliveries on component mount
+    useEffect(() => {
+        fetchDeliveries();
+    }, []);
+
+    useEffect(() => {
+        fetchDeliveries();
+    }, []);
+
     const applyFilters = () => {
         let filtered = [...data];
         if (selectedRider) {
@@ -67,69 +101,161 @@ const ShowData = () => {
         }
         setFilteredData(filtered);
     };
+    // const handleEdit = (record) => {
+    //     setEditingRecord(record);
+    //     form.setFieldsValue({
+    //         name: record.receiverName,
+    //         date: record.date,
+    //         consigneeName: record.consigneeName || record.consignee
+    //     });
+    //     setIsModalVisible(true);
+    // };
     const handleEdit = (record) => {
+        if (!record) return; // Prevent errors if record is undefined
         setEditingRecord(record);
+    
         form.setFieldsValue({
-            name: record.receiverName,
-            date: record.date,
-            consigneeName: record.consigneeName
+            name: record.receiverName || "",
+            date: record.date || "",
+            consigneeName: record.consigneeName ?? record.consignee ?? ""
         });
+    
         setIsModalVisible(true);
     };
+    
     const handleDelete = async (id) => {
         try {
-            await deleteDoc(doc(fireStore, "deliveries", id));
-            setData(prevData => prevData.filter(item => item.id !== id));
-            setFilteredData(prevFiltered => prevFiltered.filter(item => item.id !== id));
-            message.success("Delivery deleted successfully!");
+            let deleted = false;
+
+            // Check if document exists in "deliveries"
+            const deliveryRef = doc(fireStore, "deliveries", id);
+            const deliverySnap = await getDoc(deliveryRef);
+            if (deliverySnap.exists()) {
+                await deleteDoc(deliveryRef);
+                deleted = true;
+            }
+
+            // Check if document exists in "shipper"
+            const shipperRef = doc(fireStore, "shipper", id);
+            const shipperSnap = await getDoc(shipperRef);
+            if (shipperSnap.exists()) {
+                await deleteDoc(shipperRef);
+                deleted = true;
+            }
+
+            if (deleted) {
+                setData(prevData => prevData.filter(item => item.id !== id));
+                message.success("Delivery deleted successfully!");
+            } else {
+                message.warning("No matching delivery found to delete.");
+            }
         } catch (error) {
             console.error("Error deleting delivery:", error);
             message.error("Failed to delete delivery!");
         }
     };
+
     const handleKeyPress = (e, index) => {
         if (e.key === "Enter") {
-            inputRefs.current[index]?.blur(); // Remove focus
+            e.preventDefault(); // Prevents default submit behavior
+            const nextInput = inputRefs.current[index + 1];
+            if (nextInput) {
+                nextInput.focus(); // Moves focus to the next input field
+            }
         }
     };
+
     const handleReciverChange = (e, cnNumber) => { const { value } = e.target; setNewReceiver((prev) => ({ ...prev, [cnNumber]: value })) };
 
-    const handleSaveReciver = async () => {
+    const handleSaveReceiver = async () => {
         try {
             const batch = writeBatch(fireStore);
-            filteredData.forEach((item) => {
+            let hasUpdates = false;
+
+            const deliveryRefs = filteredData.map(item => doc(fireStore, "deliveries", item.id));
+            const shipperRefs = filteredData.map(item => doc(fireStore, "shipper", item.id));
+
+            const deliverySnaps = await Promise.all(deliveryRefs.map(ref => getDoc(ref)));
+            const shipperSnaps = await Promise.all(shipperRefs.map(ref => getDoc(ref)));
+
+            for (let i = 0; i < filteredData.length; i++) {
+                const item = filteredData[i];
                 if (newReceiver[item.cnNumber]) {
-                    const docRef = doc(fireStore, "deliveries", item.id);
-                    batch.update(docRef, { receiverName: newReceiver[item.cnNumber] });
+                    const deliverySnap = deliverySnaps[i];
+                    const shipperSnap = shipperSnaps[i];
+
+                    if (!deliverySnap.exists() && !shipperSnap.exists()) {
+                        console.warn(`Document with ID ${item.id} does not exist in either collection!`);
+                        continue;
+                    }
+
+                    if (deliverySnap.exists()) {
+                        batch.update(deliveryRefs[i], {
+                            receiverName: newReceiver[item.cnNumber],
+                            status: "Delivered"
+                        });
+                    }
+
+                    if (shipperSnap.exists()) {
+                        batch.update(shipperRefs[i], {
+                            receiverName: newReceiver[item.cnNumber],
+                            status: "Delivered"
+                        });
+                    }
+
+                    hasUpdates = true;
                 }
-            });
-            await batch.commit();
-            message.success("Receiver names saved successfully!");
+            }
+
+            if (hasUpdates) {
+                await batch.commit();
+                message.success("updated saved successfully");
+            } else {
+                message.warning("No valid records found to update!");
+            }
         } catch (error) {
             console.error("Error saving receiver names: ", error);
             message.error("Failed to save receiver names!");
         }
     };
-
-    const handleSave = async () => {
-        if (editRecord) {
-            await updateDoc(doc(fireStore, "deliveries", editRecord.id), editedValues);
-            fetchDeliveries();
-            setIsModalVisible(false);
-        }
-    };
     const handleModalOk = async () => {
         try {
             const values = await form.validateFields();
-            if (!editingRecord) return; // Ensure there's a record to update
+            console.log("Form Values:", values); // Debugging
 
-            const docRef = doc(fireStore, "deliveries", editingRecord.id);
-            await updateDoc(docRef, {
-                receiverName: values.name,
-                date: values.date,
-                consigneeName: values.consigneeName,
-            });
-            await fetchDeliveries(); // Fresh data reload karein
+            if (!editingRecord || !editingRecord.id) {
+                message.error("No record selected for updating!");
+                return;
+            }
+
+            const updateData = {
+                receiverName: values.name || "N/A",
+                shipperName: values.shipper || "",
+                consigneeName: values.consignee || "N/A", // Ensure it's present
+            };
+
+            console.log("Updating Firestore with:", updateData); // Debugging
+
+            const deliveryRef = doc(fireStore, "deliveries", editingRecord.id);
+            const shipperRef = doc(fireStore, "shipper", editingRecord.id);
+
+            // Check if documents exist
+            const deliveryDocSnap = await getDoc(deliveryRef);
+            const shipperDocSnap = await getDoc(shipperRef);
+
+            if (!deliveryDocSnap.exists() && !shipperDocSnap.exists()) {
+                message.error("Record does not exist!");
+                return;
+            }
+
+            // Update both documents if they exist
+            const updatePromises = [];
+            if (deliveryDocSnap.exists()) updatePromises.push(updateDoc(deliveryRef, updateData));
+            if (shipperDocSnap.exists()) updatePromises.push(updateDoc(shipperRef, updateData));
+
+            await Promise.all(updatePromises);
+
+            await fetchDeliveries(); // Refresh data
             setIsModalVisible(false);
             message.success("Record updated successfully!");
         } catch (error) {
@@ -185,14 +311,20 @@ const ShowData = () => {
             },
         },
         {
+            title: "Shipper Name",
+            dataIndex: ["shipperName" || "shipper"],
+            key: "shipperName"
+        },
+
+        {
             title: "CN Number",
             dataIndex: "cnNumber",
             key: "cnNumber",
         },
         {
             title: "Consignee Name",
-            dataIndex: "consigneeName",
-            key: "consigneeName",
+            dataIndex: "consigneeName" || "consignee",
+            key: "consignee",
         },
         {
             title: "Receiver Name",
@@ -205,6 +337,7 @@ const ShowData = () => {
                     onChange={(e) => handleReciverChange(e, record.cnNumber)}
                     onKeyDown={(e) => handleKeyPress(e, index)}
                 />
+
             ),
         },
         {
@@ -273,8 +406,8 @@ const ShowData = () => {
                                         </Button>
                                     </Col>
                                     <Col span={12} className="mt-3">
-                                        <Button className=" bg-success text-light ms-2" onClick={handleSaveReciver}>
-                                            Save Receiver Names
+                                        <Button className=" bg-success text-light ms-2" onClick={handleSaveReceiver}>
+                                            Save  Names
                                         </Button>
                                     </Col>
                                 </Row>
@@ -289,6 +422,7 @@ const ShowData = () => {
                                     showSizeChanger: false,
                                     onChange: (newPage) => setPage(newPage),
                                 }}
+                                scroll={{ x: 1000 }}
                             />
 
                             <Modal title="Edit Record" visible={isModalVisible} onOk={handleModalOk} onCancel={handleModalCancel}>
@@ -296,10 +430,13 @@ const ShowData = () => {
                                     <Form.Item name="name" label="Receiver Name" rules={[{ required: true, message: 'Please input the receiver name!' }]}>
                                         <Input />
                                     </Form.Item>
-                                    <Form.Item name="date" label="Date" rules={[{ required: true, message: 'Please input the date!' }]}>
+                                    {/* <Form.Item name="date" label="Date" rules={[{ required: true, message: 'Please input the date!' }]}>
+                                        <Input />
+                                    </Form.Item> */}
+                                    <Form.Item name="shipper" label="shipper" rules={[{ required: true, message: 'Please input the SipperName!' }]}>
                                         <Input />
                                     </Form.Item>
-                                    <Form.Item name="consigneeName" label="Consignee Name" rules={[{ required: true, message: 'Please input the consignee name!' }]}>
+                                    <Form.Item name="consignee" label="Consignee Name" rules={[{ required: true, message: 'Please input the consignee name!' }]}>
                                         <Input />
                                     </Form.Item>
                                 </Form>
@@ -315,3 +452,4 @@ const ShowData = () => {
 };
 
 export default ShowData;
+

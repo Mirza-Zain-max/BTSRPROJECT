@@ -10,7 +10,9 @@ function Header1() {
       <Container>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
+          <Link className='text-light nav-link mx-3 ' to="/booking">Data Deleted</Link>
           <Link className='text-light nav-link mx-3 ' to="/add">Add Rider</Link>
+          <Link className='text-light nav-link mx-3 ' to="/boking">Boking</Link>
           <NavDropdown title="Delivery" className='text-light mx-3' id="basic-nav-dropdown">
             <Link className='text-dark nav-link  text-center  my-2 p-1 ' to="/make-delivery"> Make Sheet</Link>
             <hr />
