@@ -59,7 +59,6 @@ const AddRider = () => {
             message.error("Error adding rider!");
         }
         setIsLoading(false);
-       
     };
 
     const deleteRider = async () => {

@@ -1,4 +1,4 @@
-import { Card, Col, Input, InputNumber, message, Row } from "antd";
+import { Button, Card, Col, Input, InputNumber, message, Row } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import React, { useEffect, useRef, useState } from "react";
 import { Container } from "react-bootstrap";
@@ -6,32 +6,27 @@ import { fireStore } from "../../Config/firebase"; // Import Firestore
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { useAuthContext } from "../../Context/Auth";
 import QuotationGenerator from "./pdf-generatoer";
+import QuotationGenerator2 from "./track-pdf";
 const Boking = () => {
   const { user } = useAuthContext()
   const [cnError, setCnError] = useState("");
-  // const [amount, setAmount] = useState();
   const descriptionRef = useRef(null);
-  // const [trackingNumber, setTrackingNumber] = useState("");
-  // const [trackingData, setTrackingData] = useState(null);
-  // const [trackingError, setTrackingError] = useState("");
   const amountRef = useRef(null);
   const [couriers, setCouriers] = useState([]);
   const [form, setForm] = useState({
-    cnNumber: "", date: "", shipperName: "", trackingId: "", contact: "", amount: "", consignee: "",
+    cnNumber: "", date: "", shipperName: "", trackingId: "", contact: "", amount: "", consigneeName: "",
     consigneeAddress: "", consigneeContact: "", origin: "", destination: "",
     pieces: "", weight: "", description: ""
   });
-
+  const [trackingResult, setTrackingResult] = useState(null);
   useEffect(() => {
     fetchCouriers();
   }, []);
-
   const fetchCouriers = async () => {
     const querySnapshot = await getDocs(collection(fireStore, "shipper"));
     const couriersList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     setCouriers(couriersList);
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prevForm) => ({
@@ -40,35 +35,78 @@ const Boking = () => {
     }));
   };
 
+
+  const handleTrackCourier = async () => {
+    try {
+      if (!form.cnNumber) {
+        message.error("Please enter a CN Number to track.");
+        return;
+      }
+
+      const querySnapshot = await getDocs(collection(fireStore, "shipper"));
+      const trackingData = querySnapshot.docs.find(
+        (doc) => doc.data().cnNumber === form.cnNumber
+      );
+
+      if (trackingData) {
+        const courierInfo = trackingData.data();
+        message.success("Courier found!");
+        setTrackingResult(courierInfo);
+      } else {
+        message.error("No record found for this CN Number.");
+        setTrackingResult(null);
+      }
+    } catch (error) {
+      console.error("Error tracking courier:", error);
+      message.error("Error tracking courier: " + error.message);
+    }
+  };
+
   const handleAddCourier = async () => {
     const timestamp = new Date().toISOString();
 
     try {
+      // Check if CN Number already exists
       const querySnapshot = await getDocs(collection(fireStore, "shipper"));
       const existingCN = querySnapshot.docs.find(doc => doc.data().cnNumber === form.cnNumber);
+
       if (existingCN) {
         setCnError("CN Number already exists! Please use a different CN Number.");
         return;
       } else {
         setCnError(""); // Clear error if valid
       }
-      const newCourier = { ...form, createdAt: Date.now(), status: "Booked", userId: user.uid };
+
+      const newCourier = {
+        ...form,
+        createdAt: Date.now(),
+        status: "Booked",
+        userId: user.uid,
+      };
+
       console.log("Saving courier:", newCourier);
+
       await addDoc(collection(fireStore, "shipper"), newCourier);
       message.success("Save successfully!");
+
+      // Reset form & error
       setForm({
-        date: "", cnNumber: "", shipperName: "", trackingId: "", contact: "", consignee: "",
+        date: "", cnNumber: "", shipperName: "", trackingId: "", contact: "", consigneeName: "",
         consigneeAddress: "", consigneeContact: "", origin: "", destination: "",
         pieces: "", weight: "", description: "", amount: ""
       });
       setCnError("");
-      fetchCouriers();
+
+      fetchCouriers(); // Refresh the list
       document.querySelector(`[name="date"]`).focus();
     } catch (error) {
       console.error("Firestore Error:", error);
       message.error("Error adding : " + error.message);
     }
   };
+
+
+
   const handleKeyPress = (e, nextRef) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -96,10 +134,26 @@ const Boking = () => {
                   <Input type="date" className="" name="date" value={form.date} onChange={handleChange} onKeyDown={(e) => handleKeyPress(e, "cnNumber")} />
                 </Col>
                 <Col xs={24} md={24} lg={12} className="px-2 py-1">
-                  <label className="mb-1 fw-bolder">CN Number:</label>
-                  <Input type="number" name="cnNumber" value={form.cnNumber} onChange={handleChange} onKeyDown={(e) => handleKeyPress(e, "shipperName")} />
-                  {cnError && <p style={{ color: "red", fontSize: "12px", marginTop: "5px" }}>{cnError}</p>}
+                <label className="fw-bolder w-100 mb-1">CN Number:</label>
+                  <Input
+                    type="number"
+                    name="cnNumber"
+                    value={form.cnNumber}
+                    onChange={handleChange}
+                    placeholder="Enter CN Number"
+                  />
+                  <Col>
+                  <Button variant="primary" className="bg-info text-light mt-2" onClick={handleTrackCourier}>Track CN</Button>
+                  </Col>
+                 
+                  {trackingResult && (
+                    <>
+                      <QuotationGenerator2 form={trackingResult} />
+                    </>
+                  )}
                 </Col>
+                  <Col>
+                  </Col>
               </Row>
               <Col span={24} className="px-2 py-1">
                 <label className="mb-1 fw-bolder">Shipper:</label>
@@ -111,7 +165,7 @@ const Boking = () => {
               </Col>
               <Col span={24} className="px-2 py-1">
                 <label className="fw-bolder">Contact Number:</label>
-                <Input type="number" name="contact" placeholder="Enter Contact Number" value={form.contact} onChange={handleChange} onKeyDown={(e) => handleKeyPress(e, "consignee")} />
+                <Input type="number" name="contact" placeholder="Enter Contact Number" value={form.contact} onChange={handleChange} onKeyDown={(e) => handleKeyPress(e, "consigneeName")} />
               </Col>
             </Card>
           </Col>
@@ -120,7 +174,7 @@ const Boking = () => {
               <Row>
                 <Col span={24} className="px-2 py-1">
                   <label className="mb-1 fw-bolder">Consignee Name:</label>
-                  <Input type="text" name="consignee" value={form.consignee} onChange={handleChange} onKeyDown={(e) => handleKeyPress(e, "consigneeAddress")} />
+                  <Input type="text" name="consigneeName" value={form.consigneeName} onChange={handleChange} onKeyDown={(e) => handleKeyPress(e, "consigneeAddress")} />
                 </Col>
               </Row>
               <Col span={24} className="px-2 py-1">
@@ -193,7 +247,7 @@ const Boking = () => {
               <Card className="mt-3 p-2">
                 <h6><b>Status:</b> {trackingData.status}</h6>
                 <p><b>Shipper:</b> {trackingData.shipperName}</p>
-                <p><b>Consignee:</b> {trackingData.consignee}</p>
+                <p><b>Consignee:</b> {trackingData.consigneeName}</p>
                 <p><b>Destination:</b> {trackingData.destination}</p>
                 <p><b>Amount:</b> RS {trackingData.amount}/-</p>
               </Card>

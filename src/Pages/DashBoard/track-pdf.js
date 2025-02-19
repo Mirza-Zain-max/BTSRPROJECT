@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Page, Text, View, Document, StyleSheet, pdf, Font, Image } from '@react-pdf/renderer';
 import { Button, Modal, Spin } from 'antd';
-import { EyeOutlined } from '@ant-design/icons';
+import { DownloadOutlined, DownOutlined, EyeOutlined } from '@ant-design/icons';
 // import { FileTextFilled } from '@ant-design/icons';
 Font.register({
   family: 'Arial',
@@ -341,7 +341,7 @@ const QuotationPDF = ({ form }) => (
 //   );
 // };
 
-const QuotationGenerator = ({ form, handleAddCourier }) => {
+const QuotationGenerator2 = ({ form }) => {
   const [isloading, setIsLoading] = useState(false);
 
   const generatePDF = async () => {
@@ -359,7 +359,6 @@ const QuotationGenerator = ({ form, handleAddCourier }) => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    handleAddCourier(); // Call your function after saving
     setTimeout(() => {
       setIsLoading(false);
     }, 3000);
@@ -371,7 +370,7 @@ const QuotationGenerator = ({ form, handleAddCourier }) => {
       {/* Button to Preview PDF */}
       <Button 
         className="p-3 border-0 text-light"
-        style={{ backgroundColor: "#240b36" }}
+        style={{ backgroundColor: "#2c3e50" }}
         onClick={() => {
           const pdfBlob = pdf(<QuotationPDF form={form} />).toBlob();
           pdfBlob.then(blob => {
@@ -387,13 +386,13 @@ const QuotationGenerator = ({ form, handleAddCourier }) => {
       <Button 
         onClick={generatePDF} 
         loading={isloading}
-        style={{ backgroundColor: "#333333" }} 
+        style={{ backgroundColor: "#642B73" }} 
         className="w-auto text-light ms-1 mt-2 p-3"
       >
-        Save & Save as Print
+        <DownloadOutlined/>
       </Button>
 
     </div>
   );
 };
-export default QuotationGenerator;
+export default QuotationGenerator2;

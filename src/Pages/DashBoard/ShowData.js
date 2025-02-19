@@ -117,7 +117,7 @@ const ShowData = () => {
         form.setFieldsValue({
             name: record.receiverName || "",
             date: record.date || "",
-            consigneeName: record.consigneeName ?? record.consignee ?? ""
+            consigneeName: record.consigneeName || record.consignee, 
         });
     
         setIsModalVisible(true);
@@ -323,7 +323,7 @@ const ShowData = () => {
         },
         {
             title: "Consignee Name",
-            dataIndex: "consigneeName" || "consignee",
+            dataIndex:  "consigneeName",
             key: "consignee",
         },
         {

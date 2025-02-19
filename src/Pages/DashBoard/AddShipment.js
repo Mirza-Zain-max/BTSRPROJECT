@@ -397,7 +397,7 @@
 // export default AddShipment;
 
 import React, { useEffect, useRef, useState } from "react";
-import { Table, Select, DatePicker, Button, Input, Form, Row, Col, Card, Typography, message } from "antd";
+import { Table, Select, DatePicker, Button, Input, Form, Row, Col, Card, Typography, message, Popconfirm } from "antd";
 import { collection, getDocs, deleteDoc, doc, query, orderBy, getDoc } from "firebase/firestore";
 import { fireStore } from "../../Config/firebase";
 import { Container } from "react-bootstrap";
@@ -414,9 +414,9 @@ const AddShipment = () => {
     const [selectedRider, setSelectedRider] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
     const [page, setPage] = useState(1);
-    const [searchValue, setSearchValue] = useState('');
+    // const [searchValue, setSearchValue] = useState('');
     const [form] = Form.useForm();
-    const inputRefs = useRef([]);
+    // const inputRefs = useRef([]);
 
     useEffect(() => {
         fetchDeliveries();
@@ -499,25 +499,25 @@ const AddShipment = () => {
             message.warning("Please select a month to delete.");
             return;
         }
-    
+
         const selectedMonthString = selectedMonth.format("YYYY-MM"); // Get YYYY-MM format
         const itemsToDelete = data.filter(delivery => delivery.date.startsWith(selectedMonthString));
-    
+
         if (itemsToDelete.length === 0) {
             message.info(`No records found for ${selectedMonthString}.`);
             return;
         }
-    
+
         setISLoading(true);
-    
+
         try {
             const deletePromises = itemsToDelete.map(async (item) => {
                 const deliveryRef = doc(fireStore, "deliveries", item.id);
                 const shipperRef = doc(fireStore, "shipper", item.id);
-    
+
                 const deliverySnap = await getDoc(deliveryRef);
                 const shipperSnap = await getDoc(shipperRef);
-    
+
                 if (deliverySnap.exists()) {
                     await deleteDoc(deliveryRef);
                 }
@@ -525,22 +525,22 @@ const AddShipment = () => {
                     await deleteDoc(shipperRef);
                 }
             });
-    
+
             await Promise.all(deletePromises);
             message.success(`Deleted all records from ${selectedMonthString}!`);
-    
+
             // Update UI
             setData(prevData => prevData.filter(item => !item.date.startsWith(selectedMonthString)));
             setFilteredData(prevData => prevData.filter(item => !item.date.startsWith(selectedMonthString)));
-    
+
         } catch (error) {
             console.error("Error deleting records:", error);
             message.error("Failed to delete records.");
         }
-    
+
         setISLoading(false);
     };
-    
+
 
 
 
@@ -586,7 +586,6 @@ const AddShipment = () => {
             setSelectedRowKeys(selectedKeys);
         },
     };
-
     return (
         <main className="auth">
             <Container className="my-3">
@@ -597,23 +596,6 @@ const AddShipment = () => {
                             <Card className="border-0">
                                 <Row>
                                     <Col span={12}>
-                                        <Col span={12} className="mt-3">
-                                            <DatePicker
-                                                className="border-1 w-75 border-black"
-                                                picker="month"
-                                                placeholder="Select Month to Delete"
-                                                onChange={setSelectedMonth}
-                                            />
-                                            <Button
-                                                className="ms-2 bg-danger text-light"
-                                                onClick={deleteByMonth}
-                                                disabled={!selectedMonth}
-                                            >
-                                                Delete by Month
-                                            </Button>
-                                        </Col>
-
-
                                         <Select
                                             placeholder="Select Rider"
                                             onChange={(value) => setSelectedRider(value)}
@@ -641,11 +623,43 @@ const AddShipment = () => {
                                             Apply Filters
                                         </Button>
                                     </Col>
+                                    <Col span={12} className="mt-3">
+                                        <DatePicker
+                                            className="border-1 w-75 border-black"
+                                            picker="month"
+                                            placeholder="Select Month to Delete"
+                                            onChange={setSelectedMonth}
+                                        />
+                                    </Col>
+                                    <Col span={12} className="mt-3">
+                                        <Popconfirm
+                                            title="Are you sure you want to delete all records for this month?"
+                                            onConfirm={deleteByMonth} // Call deleteByMonth function on confirmation
+                                            okText="Yes"
+                                            cancelText="No"
+                                        >
+                                            <Button
+                                                className="ms-2 bg-danger text-light"
+                                                disabled={!selectedMonth}
+                                            >
+                                                Delete by Month
+                                            </Button>
+                                        </Popconfirm>
+
+                                    </Col>
                                 </Row>
                             </Card>
-                            <Button onClick={handleDelete} loading={isloading} disabled={selectedRowKeys.length === 0} type="primary" danger className="mb-3">
-                                Delete Selected
-                            </Button>
+
+                            <Popconfirm
+                                title="Are you sure you want to delete?"
+                                onConfirm={handleDelete} // Call the correct function here
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button type="primary" danger className="mb-3" disabled={selectedRowKeys.length === 0}>
+                                    Delete Selected
+                                </Button>
+                            </Popconfirm>
                             <Table
                                 bordered
                                 className="border-black border-1"
@@ -662,7 +676,7 @@ const AddShipment = () => {
                                     },
                                     { title: "Shipper Name", dataIndex: "shipperName", key: "shipperName" },
                                     { title: "CN Number", dataIndex: "cnNumber", key: "cnNumber" },
-                                    { title: "Consignee Name", dataIndex: "consignee", key: "consignee" },
+                                    { title: "Consignee Name", dataIndex: "consigneeName" || "consignee", key: "consignee" },
                                     { title: "Date", dataIndex: "date", key: "date" }
                                 ]}
                                 loading={loading}
@@ -674,7 +688,7 @@ const AddShipment = () => {
                     </Col>
                 </Row>
             </Container>
-        </main>
+        </main >
     );
 };
 
