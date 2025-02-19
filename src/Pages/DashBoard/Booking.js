@@ -140,6 +140,7 @@ const Boking = () => {
                     name="cnNumber"
                     value={form.cnNumber}
                     onChange={handleChange}
+                    onKeyDown={(e) => handleKeyPress(e, "shipperName")}
                     placeholder="Enter CN Number"
                   />
                   <Col>
