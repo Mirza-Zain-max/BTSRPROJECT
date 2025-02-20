@@ -299,7 +299,7 @@ const ViewSheet = () => {
     { title: "CN Number", dataIndex: "cnNumber", key: "cnNumber" },
     {
       title: "Consignee Name",
-      dataIndex: "consigneeName" || "consignee",
+      dataIndex: "consignee",
       key: "consignee"
     },
     { title: "Receiver Name", dataIndex: "receiverName", key: "receiverName" },

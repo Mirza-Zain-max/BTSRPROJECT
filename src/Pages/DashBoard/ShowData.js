@@ -4,6 +4,7 @@ import { collection, getDocs, deleteDoc, doc, updateDoc, writeBatch, getDoc, que
 import { fireStore } from "../../Config/firebase";
 import { DeleteFilled, EditFilled } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
+import { clone } from "lodash";
 
 // const { Option } = Select;
 
@@ -113,16 +114,16 @@ const ShowData = () => {
     const handleEdit = (record) => {
         if (!record) return; // Prevent errors if record is undefined
         setEditingRecord(record);
-    
+
         form.setFieldsValue({
             name: record.receiverName || "",
             date: record.date || "",
-            consigneeName: record.consigneeName || record.consignee, 
+            consigneeName: record.consigneeName || record.consignee,
         });
-    
+
         setIsModalVisible(true);
     };
-    
+
     const handleDelete = async (id) => {
         try {
             let deleted = false;
@@ -323,8 +324,9 @@ const ShowData = () => {
         },
         {
             title: "Consignee Name",
-            dataIndex:  "consigneeName",
+            dataIndex:  "consignee", // ✅ Correct way to handle multiple fields
             key: "consignee",
+         
         },
         {
             title: "Receiver Name",
