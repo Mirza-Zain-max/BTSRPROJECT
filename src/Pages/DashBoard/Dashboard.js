@@ -13,7 +13,7 @@ const Dashboard = () => {
           <Container>
                 <Row className='d-flex justify-content-center align-items-center'>
                     <Col span={24}>
-                        <h1 className='display-2 fw-bolder text-light'>
+                        <h1 className='display-2 fw-bolder text-center text-light'>
                             Welcome To Naveed Courier & Cargo Services
                         </h1>
                      <Col span={24} className=' d-flex justify-content-center align-items-center'>
