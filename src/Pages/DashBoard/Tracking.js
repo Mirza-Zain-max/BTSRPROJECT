@@ -181,7 +181,7 @@
 
 // export default TrackShipment;
 
-
+/* eslint-disable no-unused-vars */
 import { Button, Card, Col, Input, message, Row, Typography, Spin } from "antd"; // Added Spin for loader
 import React, { useState, useEffect } from "react";
 import { Container, Table } from "react-bootstrap";
@@ -278,13 +278,13 @@ const TrackShipment = () => {
     return (
         <main className="d-flex justify-content-center align-items-center auth">
             <Container>
+            <span level={1} className="text  d-flex justify-content-center align-items-center display-3 fw-medium text-light ">Track Shipment</span>
                 <Row className="d-flex justify-content-center align-items-center">
                     <Col span={24}>
-                        <Card className="mt-5" style={{ backgroundColor: "#d6d6d6" }}>
-                            <Title level={1}>Track Shipment</Title>
-                            <label className="fw-bolder mb-4">Enter CN Number:</label>
+                        <Card className="mt-5 card2 border-0 " style={{ backgroundColor: "#d6d6d6" }}>
+                            <label className="fw-bolder fs-3 my-4">Enter CN Number:</label>
                             <Input className="mb-4" type="text" value={trackCN} onChange={handleTrackCNChange} onKeyDown={handleKeyPress} placeholder="Enter CN Number" />
-                            <Button className="w-25 p-3 mb-3" type="primary" onClick={trackShipment} disabled={loading}>
+                            <Button className=" p-4 rounded-pill text-light border-0 fs-5 mb-3" style={{backgroundColor:"gray"}} onClick={trackShipment} disabled={loading}>
                                 {loading ? <Spin /> : "Track"} {/* Show loader inside button */}
                             </Button>
                             {/* <Button className="w-25 p-3 d-none" type="primary" onClick={saveTrackingData}>

@@ -184,7 +184,7 @@
 
 // export default ListShipments;
 
-
+/* eslint-disable no-unused-vars */
 import { DeleteFilled, FileAddFilled } from '@ant-design/icons';
 import { Col, Input, message, Modal, Row } from 'antd';
 import React, { useState, useEffect } from 'react';

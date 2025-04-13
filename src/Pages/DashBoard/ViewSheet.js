@@ -310,10 +310,11 @@ const ViewSheet = () => {
   return (
     <main className="auth d-flex justify-content-center align-items-center">
       <Container>
+      <span level={1} className="text  d-flex justify-content-center align-items-center display-3 fw-medium text-light "> View Delivery Sheet</span>
+
         <Row className="d-flex justify-content-center align-items-center">
           <Col span={20}>
-            <Card style={{ backgroundColor: "#d6d6d6" }} className="mt-5">
-              <Title level={1}>View Delivery Sheet</Title>
+            <Card style={{ backgroundColor: "#d6d6d6" }} className="mt-5 card2">
               <label>Select Rider:</label>
               <Select name="riderId" value={delivery.riderId} onChange={(value) => handleDeliveryChange("riderId", value)} style={{ width: "100%", marginBottom: "1rem" }} placeholder="Select a rider" showSearch filterOption={(input, option) => option?.children?.toLowerCase().includes(input.toLowerCase())}>
                 {riders.map((rider) => (
@@ -324,7 +325,7 @@ const ViewSheet = () => {
               </Select>
               <label>Select Date:</label>
               <Input type="date" name="date" value={delivery.date} onChange={(e) => handleDeliveryChange("date", e.target.value)} style={{ width: "100%", marginBottom: "1rem" }} />
-              <Button type="primary" onClick={viewDeliverySheet} loading={isloading} style={{ marginBottom: "1rem" }}>
+              <Button  onClick={viewDeliverySheet} loading={isloading} className="text-light border-0" style={{ marginBottom: "1rem",backgroundColor:"gray" }}>
                 View Delivery Sheet
               </Button>
               {deliverySheetData.length > 0 ? (

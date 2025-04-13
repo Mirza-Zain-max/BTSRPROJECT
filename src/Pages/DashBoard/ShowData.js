@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useRef, useState } from "react";
 import { Table, Select, DatePicker, Button, Modal, Input, message, Form, Row, Col, Card, Typography, Popconfirm } from "antd";
 import { collection, getDocs, deleteDoc, doc, updateDoc, writeBatch, getDoc, query, orderBy } from "firebase/firestore";
@@ -352,7 +353,7 @@ const ShowData = () => {
             key: "actions",
             render: (_, record) => (
                 <>
-                    <Button className="bg-success text-light" onClick={() => handleEdit(record)}>
+                    <Button className="bg-success text-light rounded-pill border-0" onClick={() => handleEdit(record)}>
                         <EditFilled />
                     </Button>
                     <Popconfirm
@@ -361,7 +362,7 @@ const ShowData = () => {
                         okText="Yes"
                         cancelText="No"
                     >
-                        <Button className="bg-danger  text-light" danger>
+                        <Button className="bg-danger  text-light rounded-pill border-0" danger>
                             <DeleteFilled />
                         </Button>
                     </Popconfirm>
@@ -373,10 +374,10 @@ const ShowData = () => {
     return (
         <main className="auth">
             <Container className="my-3" >
+            <span level={1} className="text  d-flex justify-content-center align-items-center display-3 fw-medium text-light mt-3 ">Show Data</span>
                 <Row>
                     <Col span={24} className="mt-5">
-                        <Title level={1} className="text-light"> Show Data</Title>
-                        <Card className="border-1 mt-5 border-black">
+                        <Card className="border-0 card2  ">
                             <Card className="border-0">
                                 <Row>
                                     <Col span={12}>
@@ -398,23 +399,23 @@ const ShowData = () => {
 
                                     </Col>
                                     <Col span={12}>
-                                        <DatePicker className="border-1 w-75 border-black" placeholder="Select Date" onChange={setSelectedDate} />
-                                        <Button className="ms-2 bg-black text-light" onClick={applyFilters}>Apply Filters</Button>
+                                        <DatePicker className="border-1 w-75 border-bottom " placeholder="Select Date" onChange={setSelectedDate} />
+                                        <Button className="ms-2  text-light rounded-pill border-0" style={{backgroundColor:"#3E5151"}} onClick={applyFilters}>Apply Filters</Button>
                                     </Col>
                                     <Col span={12} className="mt-3">
-                                        <Input className="border-1 w-75 border-black" placeholder="Enter CN Number" value={searchValue} onChange={handleSearchChange} allowClear />
-                                        <Button type="primary" className="ms-2" onClick={handleSearchClick}>
+                                        <Input className="border-1 w-75 border-bottom " placeholder="Enter CN Number" value={searchValue} onChange={handleSearchChange} allowClear />
+                                        <Button style={{backgroundColor:"grayText"}} className="ms-2 text-light rounded-pill border-0" onClick={handleSearchClick}>
                                             Search
                                         </Button>
                                     </Col>
                                     <Col span={12} className="mt-3">
-                                        <Button className=" bg-success text-light ms-2" onClick={handleSaveReceiver}>
+                                        <Button className=" bg-success text-light ms-2 rounded-pill border-0" onClick={handleSaveReceiver}>
                                             Save  Names
                                         </Button>
                                     </Col>
                                 </Row>
                             </Card>
-                            <Table bordered className="border-black border-1  "
+                            <Table bordered className="  "
                                 dataSource={filteredData.map((item, index) => ({ ...item, key: item.id || index }))}
                                 columns={columns}
                                 loading={loading}

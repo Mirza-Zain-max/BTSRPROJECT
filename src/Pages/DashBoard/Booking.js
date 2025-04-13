@@ -1,4 +1,5 @@
-import { Button, Card, Col, Input, InputNumber, message, Row } from "antd";
+/* eslint-disable no-unused-vars */
+import { Button, Card, Col, Input, InputNumber, message, Row, Typography } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import React, { useEffect, useRef, useState } from "react";
 import { Container } from "react-bootstrap";
@@ -9,6 +10,7 @@ import QuotationGenerator from "./pdf-generatoer";
 import QuotationGenerator2 from "./track-pdf";
 const Boking = () => {
   const { user } = useAuthContext()
+  const { Title } = Typography;
   const [cnError, setCnError] = useState("");
   const descriptionRef = useRef(null);
   const amountRef = useRef(null);
@@ -125,9 +127,10 @@ const Boking = () => {
   return (
     <main className="auth d-flex justify-content-center align-items-center">
       <Container>
+          <span level={1} className="text  d-flex justify-content-center align-items-center display-3 fw-medium text-light "> Booking</span>
         <Row className="my-3">
           <Col md={24} lg={12}>
-            <Card className="border-1 border-black rounded-5" >
+            <Card className="border-0 card2 rounded-5" >
               <Row>
                 <Col xs={24} md={24} lg={12} className="px-2 py-1">
                   <label className="fw-bolder w-100 mb-1">Date:</label>
@@ -144,7 +147,7 @@ const Boking = () => {
                     placeholder="Enter CN Number"
                   />
                   <Col>
-                  <Button variant="primary" className="bg-info text-light mt-2" onClick={handleTrackCourier}>Track CN</Button>
+                  <Button  className="  rounded-pill border-0 text-light mt-2" style={{backgroundColor:"#302b63"}} onClick={handleTrackCourier}>Track CN</Button>
                   </Col>
                  
                   {trackingResult && (
@@ -171,7 +174,7 @@ const Boking = () => {
             </Card>
           </Col>
           <Col lg={12}>
-            <Card className="border-1 overflow-auto flex-wrap border-black rounded-5">
+            <Card className="border-1 overflow-auto flex-wrap border-0 card2  rounded-5">
               <Row>
                 <Col span={24} className="px-2 py-1">
                   <label className="mb-1 fw-bolder">Consignee Name:</label>
@@ -224,7 +227,7 @@ const Boking = () => {
               </Row>
             </Card>
           </Col>
-          {/* <Card className="border-1 border-black rounded-5 p-3">
+          {/* <Card className="border-0 rounded-5 p-3">
             <h5 className="fw-bold">Track Your Shipment</h5>
             <Row>
               <Col xs={18}>

@@ -51,7 +51,7 @@ import styled from 'styled-components';
 
 const ScreenLoader = () => {
     return (
-        <main className='d-flex justify-content-center align-items-center' style={{ height: '100vh', backgroundColor: "#2c5364" }} >
+        <main className='d-flex justify-content-center align-items-center' style={{ height: '100vh', backgroundColor: "#3E5151" }} >
             <StyledWrapper>
                 <div className="loader">
                     <div className="truckWrapper">

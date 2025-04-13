@@ -115,10 +115,10 @@ const RunSheet = () => {
     return (
         <main className="d-flex justify-content-center align-items-center auth">
             <Container>
+            <span level={1} className="text  d-flex justify-content-center align-items-center display-3 fw-medium text-light ">Make Delivery Sheet</span>
                 <Row className="d-flex justify-content-center align-items-center">
                     <Col span={22}>
-                        <Card style={{ backgroundColor: "#d6d6d6" }} className="border-2 border-bottom border-black">
-                            <Title level={1}>Make Delivery Sheet</Title>
+                        <Card style={{ backgroundColor: "#d6d6d6" }} className="border-0 card2 mt-5 ">
                             <form onSubmit={saveDelivery}>
                                 <label className="fw-bolder my-2 me-3">Select Rider:</label>
                                 {riders.length === 0 ? (
@@ -143,11 +143,11 @@ const RunSheet = () => {
                                 )}
                                 <label className="fw-bolder mb-2">Date:</label>
                                 <Input type="date" className="mb-2" name="date" value={delivery.date} onChange={handleDeliveryChange} />
-                                <label className="mb-2">CN Number:</label>
+                                <label className="mb-2 fw-bolder">CN Number:</label>
                                 <Input type="number" className="mb-2" name="cnNumber" value={delivery.cnNumber} onChange={handleDeliveryChange} ref={cnNumberRef} onKeyDown={(e) => handleKeyDown(e, "cnNumber")} />
-                                <label className="mb-2">Consignee Name:</label>
+                                <label className="mb-2 fw-bolder">Consignee Name:</label>
                                 <Input type="text" className="mb-3" name="consignee" value={delivery.consignee} onChange={handleDeliveryChange} ref={consigneeNameRef} onKeyDown={(e) => handleKeyDown(e, "submit")} />
-                                <Button type="primary" htmlType="submit" loading={isLoading}>Save Delivery</Button>
+                                <Button style={{backgroundColor:"gray"}} htmlType="submit" className="text-light border-0" loading={isLoading}>Save Delivery</Button>
                             </form>
                         </Card>
                     </Col>

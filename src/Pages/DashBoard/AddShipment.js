@@ -395,7 +395,7 @@
 // };
 
 // export default AddShipment;
-
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useRef, useState } from "react";
 import { Table, Select, DatePicker, Button, Input, Form, Row, Col, Card, Typography, message, Popconfirm } from "antd";
 import { collection, getDocs, deleteDoc, doc, query, orderBy, getDoc } from "firebase/firestore";
@@ -589,11 +589,11 @@ const AddShipment = () => {
     return (
         <main className="auth">
             <Container className="my-3">
+            <span level={1} className="text  d-flex justify-content-center align-items-center display-3 fw-medium text-light mt-4 ">Show Data</span>
                 <Row>
                     <Col span={24} className="mt-5">
-                        <Title level={1} className="text-light">Show Data</Title>
-                        <Card className="border-1 mt-5 border-black">
-                            <Card className="border-0">
+                        <Card className="border-0 card2 ">
+                            <Card className="border-0 ">
                                 <Row>
                                     <Col span={12}>
                                         <Select

@@ -1,7 +1,8 @@
-// QuotationPDF.js
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { Page, Text, View, Document, StyleSheet, pdf, Font, Image } from '@react-pdf/renderer';
 import { Button, Modal, Spin } from 'antd';
+import logo from "../Assets/naveed5.png"
 import { DownloadOutlined, DownOutlined, EyeOutlined } from '@ant-design/icons';
 // import { FileTextFilled } from '@ant-design/icons';
 Font.register({
@@ -45,7 +46,7 @@ const QuotationPDF = ({ form }) => (
       <View style={styles.container}>
         <View style={styles.infoRow}>
           <View style={styles.infoCol}>
-            <Image src="Assets/naveed2.png" style={{ height: 55, width: 186 }} />
+            <Image src={logo} style={{ height: 58, width: 185 }} />
           </View>
           <View style={styles.infoCol}>
             <View  >
@@ -126,7 +127,7 @@ const QuotationPDF = ({ form }) => (
       <View style={styles.container}>
         <View style={styles.infoRow}>
           <View style={styles.infoCol}>
-            <Image src="Assets/naveed2.png" style={{ height: 55, width: 186 }} />
+            <Image src={logo} style={{ height: 58, width: 185 }} />
           </View>
           <View style={styles.infoCol}>
             <View  >
@@ -207,7 +208,7 @@ const QuotationPDF = ({ form }) => (
       <View style={styles.container}>
         <View style={styles.infoRow}>
           <View style={styles.infoCol}>
-            <Image src="Assets/naveed2.png" style={{ height: 55, width: 186 }} />
+            <Image src={logo} style={{ height: 58, width: 185 }} />
           </View>
           <View style={styles.infoCol}>
             <View  >
@@ -350,7 +351,7 @@ const QuotationGenerator2 = ({ form }) => {
     const doc = <QuotationPDF form={form} />;
     const pdfBlob = await pdf(doc).toBlob();
     const url = URL.createObjectURL(pdfBlob);
-    
+
     const a = document.createElement("a");
     a.href = url;
     a.download = `${form.date}_${form.consignee}.pdf`;
@@ -368,9 +369,9 @@ const QuotationGenerator2 = ({ form }) => {
   return (
     <div>
       {/* Button to Preview PDF */}
-      <Button 
+      <Button
         className="p-3 border-0 text-light"
-        style={{ backgroundColor: "#2c3e50" }}
+        style={{ backgroundColor: "red" }}
         onClick={() => {
           const pdfBlob = pdf(<QuotationPDF form={form} />).toBlob();
           pdfBlob.then(blob => {
@@ -383,13 +384,13 @@ const QuotationGenerator2 = ({ form }) => {
       </Button>
 
       {/* Button to Save & Print */}
-      <Button 
-        onClick={generatePDF} 
+      <Button
+        onClick={generatePDF}
         loading={isloading}
-        style={{ backgroundColor: "#642B73" }} 
+        style={{ backgroundColor: "#642B73" }}
         className="w-auto text-light ms-1 mt-2 p-3"
       >
-        <DownloadOutlined/>
+        <DownloadOutlined />
       </Button>
 
     </div>

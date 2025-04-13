@@ -1,7 +1,8 @@
 // QuotationPDF.js
 import React, { useState } from 'react';
 import { Page, Text, View, Document, StyleSheet, pdf, Font, Image } from '@react-pdf/renderer';
-import { Button, Modal, Spin } from 'antd';
+import { Button } from 'antd';
+import logo from "../Assets/naveed5.png"
 import { EyeOutlined } from '@ant-design/icons';
 // import { FileTextFilled } from '@ant-design/icons';
 Font.register({
@@ -45,7 +46,7 @@ const QuotationPDF = ({ form }) => (
       <View style={styles.container}>
         <View style={styles.infoRow}>
           <View style={styles.infoCol}>
-            <Image src="Assets/naveed2.png" style={{ height: 55, width: 186 }} />
+            <Image src={logo} style={{ height: 58, width: 185 }} />
           </View>
           <View style={styles.infoCol}>
             <View  >
@@ -126,7 +127,7 @@ const QuotationPDF = ({ form }) => (
       <View style={styles.container}>
         <View style={styles.infoRow}>
           <View style={styles.infoCol}>
-            <Image src="Assets/naveed2.png" style={{ height: 55, width: 186 }} />
+          <Image src={logo} style={{ height: 58, width: 185 }} />
           </View>
           <View style={styles.infoCol}>
             <View  >
@@ -207,7 +208,7 @@ const QuotationPDF = ({ form }) => (
       <View style={styles.container}>
         <View style={styles.infoRow}>
           <View style={styles.infoCol}>
-            <Image src="Assets/naveed2.png" style={{ height: 55, width: 186 }} />
+          <Image src={logo} style={{ height: 58, width: 185 }} />
           </View>
           <View style={styles.infoCol}>
             <View  >
@@ -370,8 +371,8 @@ const QuotationGenerator = ({ form, handleAddCourier }) => {
     <div>
       {/* Button to Preview PDF */}
       <Button 
-        className="p-3 border-0 text-light"
-        style={{ backgroundColor: "#240b36" }}
+        className="p-3 rounded-pill border-0 text-light"
+        style={{ backgroundColor: "#3E5151" }}
         onClick={() => {
           const pdfBlob = pdf(<QuotationPDF form={form} />).toBlob();
           pdfBlob.then(blob => {
@@ -388,7 +389,7 @@ const QuotationGenerator = ({ form, handleAddCourier }) => {
         onClick={generatePDF} 
         loading={isloading}
         style={{ backgroundColor: "#333333" }} 
-        className="w-auto text-light ms-1 mt-2 p-3"
+        className="w-auto rounded-pill border-0 text-light ms-1 mt-2 p-3"
       >
         Save & Save as Print
       </Button>
