@@ -112,18 +112,57 @@ const ShowData = () => {
     //     });
     //     setIsModalVisible(true);
     // };
+    // ✅ یہ نیا فنکشن رکھ لو اوپر کہیں
+    const updateOnlyConsigneeName = async (id, newConsigneeValue) => {
+        try {
+            //   console.log("Updating Consignee...");
+            //   console.log("Record ID:", id);
+            //   console.log("New Consignee:", newConsigneeValue);
+
+            const deliveryRef = doc(fireStore, "deliveries", id);
+            const shipperRef = doc(fireStore, "shipper", id);
+
+            const deliverySnap = await getDoc(deliveryRef);
+            const shipperSnap = await getDoc(shipperRef);
+
+            //   console.log("Delivery exists:", deliverySnap.exists());
+            //   console.log("Shipper exists:", shipperSnap.exists());
+
+            const updateData = { consignee: newConsigneeValue || "N/A" }; // ✅ Notice here!
+
+            //   console.log("Update Data:", updateData);
+
+            if (deliverySnap.exists()) {
+                // console.log("Updating in Deliveries...");
+                await updateDoc(deliveryRef, updateData);
+            }
+
+            if (shipperSnap.exists()) {
+                // console.log("Updating in Shipper...");
+                await updateDoc(shipperRef, updateData);
+            }
+
+            message.success("Consignee updated successfully!");
+        } catch (error) {
+            console.error("❌ Error during Consignee Update:", error);
+            message.error("Failed to update consignee!");
+        }
+    };
+
     const handleEdit = (record) => {
-        if (!record) return; // Prevent errors if record is undefined
+        if (!record) return;
+
+        // console.log("Editing this record:", record);
+
         setEditingRecord(record);
 
         form.setFieldsValue({
-            name: record.receiverName || "",
-            date: record.date || "",
-            consigneeName: record.consigneeName || record.consignee,
+            consignee: record.consignee || "",
         });
 
         setIsModalVisible(true);
     };
+
 
     const handleDelete = async (id) => {
         try {
@@ -169,6 +208,57 @@ const ShowData = () => {
 
     const handleReciverChange = (e, cnNumber) => { const { value } = e.target; setNewReceiver((prev) => ({ ...prev, [cnNumber]: value })) };
 
+    // const handleSaveReceiver = async () => {
+    //     try {
+    //         const batch = writeBatch(fireStore);
+    //         let hasUpdates = false;
+
+    //         const deliveryRefs = filteredData.map(item => doc(fireStore, "deliveries", item.id));
+    //         const shipperRefs = filteredData.map(item => doc(fireStore, "shipper", item.id));
+
+    //         const deliverySnaps = await Promise.all(deliveryRefs.map(ref => getDoc(ref)));
+    //         const shipperSnaps = await Promise.all(shipperRefs.map(ref => getDoc(ref)));
+
+    //         for (let i = 0; i < filteredData.length; i++) {
+    //             const item = filteredData[i];
+    //             if (newReceiver[item.cnNumber]) {
+    //                 const deliverySnap = deliverySnaps[i];
+    //                 const shipperSnap = shipperSnaps[i];
+
+    //                 if (!deliverySnap.exists() && !shipperSnap.exists()) {
+    //                     console.warn(`Document with ID ${item.id} does not exist in either collection!`);
+    //                     continue;
+    //                 }
+
+    //                 if (deliverySnap.exists()) {
+    //                     batch.update(deliveryRefs[i], {
+    //                         receiverName: newReceiver[item.cnNumber],
+    //                         status: "Delivered"
+    //                     });
+    //                 }
+
+    //                 if (shipperSnap.exists()) {
+    //                     batch.update(shipperRefs[i], {
+    //                         receiverName: newReceiver[item.cnNumber],
+    //                         status: "Delivered"
+    //                     });
+    //                 }
+
+    //                 hasUpdates = true;
+    //             }
+    //         }
+
+    //         if (hasUpdates) {
+    //             await batch.commit();
+    //             message.success("updated saved successfully");
+    //         } else {
+    //             message.warning("No valid records found to update!");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error saving receiver names: ", error);
+    //         message.error("Failed to save receiver names!");
+    //     }
+    // };
     const handleSaveReceiver = async () => {
         try {
             const batch = writeBatch(fireStore);
@@ -194,6 +284,7 @@ const ShowData = () => {
                     if (deliverySnap.exists()) {
                         batch.update(deliveryRefs[i], {
                             receiverName: newReceiver[item.cnNumber],
+                            consigneeName: newReceiver[item.cnNumber],  // ✅ Add this line
                             status: "Delivered"
                         });
                     }
@@ -201,6 +292,7 @@ const ShowData = () => {
                     if (shipperSnap.exists()) {
                         batch.update(shipperRefs[i], {
                             receiverName: newReceiver[item.cnNumber],
+                            consigneeName: newReceiver[item.cnNumber],  // ✅ Add this line
                             status: "Delivered"
                         });
                     }
@@ -211,7 +303,7 @@ const ShowData = () => {
 
             if (hasUpdates) {
                 await batch.commit();
-                message.success("updated saved successfully");
+                message.success("Updated saved successfully");
             } else {
                 message.warning("No valid records found to update!");
             }
@@ -220,51 +312,77 @@ const ShowData = () => {
             message.error("Failed to save receiver names!");
         }
     };
+
+    // const handleModalOk = async () => {
+    //     try {
+    //         const values = await form.validateFields();
+    //         console.log("Form Values:", values); // Debugging
+
+    //         if (!editingRecord || !editingRecord.id) {
+    //             message.error("No record selected for updating!");
+    //             return;
+    //         }
+
+    //         const updateData = {
+    //             receiverName: values.name || "N/A",
+    //             shipperName: values.shipper || "",
+    //             consigneeName: values.consignee || "N/A", // Ensure it's present
+    //         };
+
+    //         console.log("Updating Firestore with:", updateData); // Debugging
+
+    //         const deliveryRef = doc(fireStore, "deliveries", editingRecord.id);
+    //         const shipperRef = doc(fireStore, "shipper", editingRecord.id);
+
+    //         // Check if documents exist
+    //         const deliveryDocSnap = await getDoc(deliveryRef);
+    //         const shipperDocSnap = await getDoc(shipperRef);
+
+    //         if (!deliveryDocSnap.exists() && !shipperDocSnap.exists()) {
+    //             message.error("Record does not exist!");
+    //             return;
+    //         }
+
+    //         // Update both documents if they exist
+    //         const updatePromises = [];
+    //         if (deliveryDocSnap.exists()) updatePromises.push(updateDoc(deliveryRef, updateData));
+    //         if (shipperDocSnap.exists()) updatePromises.push(updateDoc(shipperRef, updateData));
+
+    //         await Promise.all(updatePromises);
+
+    //         await fetchDeliveries(); // Refresh data
+    //         setIsModalVisible(false);
+    //         message.success("Record updated successfully!");
+    //     } catch (error) {
+    //         console.error("Error updating record: ", error);
+    //         message.error("Failed to update record!");
+    //     }
+    // };
     const handleModalOk = async () => {
         try {
             const values = await form.validateFields();
-            console.log("Form Values:", values); // Debugging
+
+            // console.log("Form Values received on Save:", values);
 
             if (!editingRecord || !editingRecord.id) {
                 message.error("No record selected for updating!");
                 return;
             }
 
-            const updateData = {
-                receiverName: values.name || "N/A",
-                shipperName: values.shipper || "",
-                consigneeName: values.consignee || "N/A", // Ensure it's present
-            };
+            // console.log("Editing Record:", editingRecord);
 
-            console.log("Updating Firestore with:", updateData); // Debugging
+            await updateOnlyConsigneeName(editingRecord.id, values.consignee);
 
-            const deliveryRef = doc(fireStore, "deliveries", editingRecord.id);
-            const shipperRef = doc(fireStore, "shipper", editingRecord.id);
-
-            // Check if documents exist
-            const deliveryDocSnap = await getDoc(deliveryRef);
-            const shipperDocSnap = await getDoc(shipperRef);
-
-            if (!deliveryDocSnap.exists() && !shipperDocSnap.exists()) {
-                message.error("Record does not exist!");
-                return;
-            }
-
-            // Update both documents if they exist
-            const updatePromises = [];
-            if (deliveryDocSnap.exists()) updatePromises.push(updateDoc(deliveryRef, updateData));
-            if (shipperDocSnap.exists()) updatePromises.push(updateDoc(shipperRef, updateData));
-
-            await Promise.all(updatePromises);
-
-            await fetchDeliveries(); // Refresh data
+            await fetchDeliveries();
+            form.resetFields();
             setIsModalVisible(false);
-            message.success("Record updated successfully!");
         } catch (error) {
-            console.error("Error updating record: ", error);
-            message.error("Failed to update record!");
+            // console.error("❌ Error in handleModalOk:", error);
+            message.error("Failed to update consignee name!");
         }
     };
+
+
 
     const onSearch = (value) => {
         let filtered = [...data];
@@ -325,9 +443,9 @@ const ShowData = () => {
         },
         {
             title: "Consignee Name",
-            dataIndex:  "consignee", // ✅ Correct way to handle multiple fields
+            dataIndex: "consignee", // ✅ Correct way to handle multiple fields
             key: "consignee",
-         
+
         },
         {
             title: "Receiver Name",
@@ -374,7 +492,7 @@ const ShowData = () => {
     return (
         <main className="auth">
             <Container className="my-3" >
-            <span level={1} className="text  d-flex justify-content-center align-items-center display-3 fw-medium text-light mt-3 ">Show Data</span>
+                <span level={1} className="text  d-flex justify-content-center align-items-center display-3 fw-medium text-light mt-3 ">Show Data</span>
                 <Row>
                     <Col span={24} className="mt-5">
                         <Card className="border-0 card2  ">
@@ -400,11 +518,11 @@ const ShowData = () => {
                                     </Col>
                                     <Col span={12}>
                                         <DatePicker className="border-1 w-75 border-bottom " placeholder="Select Date" onChange={setSelectedDate} />
-                                        <Button className="ms-2  text-light rounded-pill border-0" style={{backgroundColor:"#3E5151"}} onClick={applyFilters}>Apply Filters</Button>
+                                        <Button className="ms-2  text-light rounded-pill border-0" style={{ backgroundColor: "#3E5151" }} onClick={applyFilters}>Apply Filters</Button>
                                     </Col>
                                     <Col span={12} className="mt-3">
                                         <Input className="border-1 w-75 border-bottom " placeholder="Enter CN Number" value={searchValue} onChange={handleSearchChange} allowClear />
-                                        <Button style={{backgroundColor:"grayText"}} className="ms-2 text-light rounded-pill border-0" onClick={handleSearchClick}>
+                                        <Button style={{ backgroundColor: "grayText" }} className="ms-2 text-light rounded-pill border-0" onClick={handleSearchClick}>
                                             Search
                                         </Button>
                                     </Col>
@@ -428,14 +546,14 @@ const ShowData = () => {
                                 scroll={{ x: 1000 }}
                             />
 
-                            <Modal title="Edit Record" visible={isModalVisible} onOk={handleModalOk} onCancel={handleModalCancel}>
+                            {/* <Modal title="Edit Record" visible={isModalVisible} onOk={handleModalOk} onCancel={handleModalCancel}>
                                 <Form form={form} layout="vertical">
                                     <Form.Item name="name" label="Receiver Name" rules={[{ required: true, message: 'Please input the receiver name!' }]}>
                                         <Input />
                                     </Form.Item>
                                     {/* <Form.Item name="date" label="Date" rules={[{ required: true, message: 'Please input the date!' }]}>
                                         <Input />
-                                    </Form.Item> */}
+                                    </Form.Item> 
                                     <Form.Item name="shipper" label="shipper" rules={[{ required: true, message: 'Please input the SipperName!' }]}>
                                         <Input />
                                     </Form.Item>
@@ -443,7 +561,26 @@ const ShowData = () => {
                                         <Input />
                                     </Form.Item>
                                 </Form>
+                            </Modal> */}
+                            <Modal
+                                title="Edit Consignee Name"
+                                open={isModalVisible}
+                                onOk={handleModalOk}
+                                onCancel={handleModalCancel}
+                            >
+                                <Form form={form} layout="vertical">
+                                    <Form.Item
+                                        name="consignee"
+                                        label="Consignee Name"
+                                        rules={[{ required: true, message: 'Please input the consignee name!' }]}
+                                    >
+                                        <Input placeholder="Enter Consignee Name" />
+                                    </Form.Item>
+                                </Form>
                             </Modal>
+
+
+
 
                         </Card>
                     </Col>
